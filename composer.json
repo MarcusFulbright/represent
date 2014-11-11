@@ -1,0 +1,27 @@
+{
+    "name": "marcusfulbright/represent",
+    "type": "library",
+    "description": "Tools that can build differient representations of objects",
+    "keywords": ["representor", "rest", "api", "hypermedia"],
+    "homepage": "http://github.com/MarcusFulbright/represent",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Marcus Fulbright",
+            "email": "fulbright.marcus@gmail.com"
+        }
+    ],
+
+    "require": {
+        "php": ">=5.3.9",
+        "doctrine/common": "2.3.*"
+    },
+
+    "require-dev": {
+
+    },
+
+    "autoload": {
+        "psr-4": { "Represent\\": "src/" }
+    }
+}
