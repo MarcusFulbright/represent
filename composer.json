@@ -11,17 +11,11 @@
             "email": "fulbright.marcus@gmail.com"
         }
     ],
-
     "require": {
         "php": ">=5.3.9",
         "doctrine/common": "2.3.*"
     },
-
-    "require-dev": {
-
-    },
-
     "autoload": {
-        "psr-4": { "Represent\\": "src/" }
+        "psr-0": { "represent\\": "src/" }
     }
 }
