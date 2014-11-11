@@ -2,6 +2,8 @@
 
 namespace represent\tests\fixtures;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
 class ParentTest
 {
     private $firstName;
@@ -12,12 +14,15 @@ class ParentTest
 
     public $publicTest;
 
+    private $children;
+
     public function __construct($firstName = null, $lastName = null, $age = null, $publicTest = null)
     {
         $this->firstName   = $firstName;
         $this->lastName    = $lastName;
         $this->age         = $age;
-        $this->publicTest = $publicTest;
+        $this->publicTest  = $publicTest;
+        $this->children    = new ArrayCollection();
     }
 
     /**
@@ -66,5 +71,29 @@ class ParentTest
     public function getLastName()
     {
         return $this->lastName;
+    }
+
+    /**
+     * @param \Doctrine\Common\Collections\ArrayCollection $children
+     */
+    public function setChildren($children)
+    {
+        $this->children = $children;
+    }
+
+    /**
+     * @return \Doctrine\Common\Collections\ArrayCollection
+     */
+    public function getChildren()
+    {
+        return $this->children;
+    }
+
+    /**
+     * @param ChildTest $child
+     */
+    public function  addChild(ChildTest $child)
+    {
+        $this->children->add($child);
     }
 }
