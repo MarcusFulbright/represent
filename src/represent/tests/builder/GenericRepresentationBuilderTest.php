@@ -45,4 +45,35 @@ class GenericRepresentationBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($expected, $result);
     }
+
+    public function testBuildObjectRepresentationWithNormalArray()
+    {
+        $parent = new ParentTest('first', 'last', 20, array(1,2,array(3,4)));
+        $parent->addChild(new \represent\tests\fixtures\ChildTest('first', 'last'));
+
+        $builder = new GenericRepresentationBuilder();
+        $result  = $builder->buildObjectRepresentation($parent);
+
+        $expected = array(
+            'firstName' => 'first',
+            'lastName'  => 'last',
+            'age'       => 20,
+            'publicTest' => array(
+                1,
+                2,
+                array(
+                    3,4
+                ),
+            ),
+            'children' => array(
+                0 => array(
+                    'firstName' => 'first',
+                    'lastName'  => 'last'
+                )
+            )
+
+        );
+
+        $this->assertEquals($expected, $result);
+    }
 }
