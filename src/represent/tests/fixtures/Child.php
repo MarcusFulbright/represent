@@ -3,6 +3,7 @@
 
 namespace represent\tests\fixtures;
 
+use Doctrine\Common\Collections\ArrayCollection;
 
 class Child
 {
@@ -10,10 +11,13 @@ class Child
 
     private $lastName;
 
+    private $toys;
+
     public function __construct($firstName, $lastName)
     {
         $this->firstName = $firstName;
         $this->lastName  = $lastName;
+        $this->toys      = new ArrayCollection();
     }
 
     /**
@@ -48,5 +52,12 @@ class Child
         return $this->lastName;
     }
 
+    /**
+     * @param Toy $toy
+     */
+    public function addToy(Toy $toy)
+    {
+        $this->toys->add($toy);
+    }
 
 }
