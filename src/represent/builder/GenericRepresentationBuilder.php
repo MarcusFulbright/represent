@@ -28,12 +28,11 @@ class GenericRepresentationBuilder
 
     private function handleProperties(\ReflectionClass $reflection, $original)
     {
-        $output = array();
+        $output = new \stdClass();
 
         foreach ($reflection->getProperties() as $property)
         {
             $property->setAccessible(true);
-
             $name  = $property->getName();
             $value = $property->getValue($original);
 
@@ -45,7 +44,7 @@ class GenericRepresentationBuilder
             if (is_array($value)) {
                 $output = $this->handleArray($name, $value, $output);
             } else {
-                $output[$name] = $value;
+                $output->$name = $value;
             }
         }
 
@@ -71,7 +70,7 @@ class GenericRepresentationBuilder
                 $parsed[] = $value;
             }
         }
-        $output[$name] = $parsed;
+        $output->$name = $parsed;
 
         return $output;
     }

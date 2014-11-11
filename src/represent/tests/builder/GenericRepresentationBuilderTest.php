@@ -13,13 +13,12 @@ class GenericRepresentationBuilderTest extends \PHPUnit_Framework_TestCase
         $builder = new GenericRepresentationBuilder();
         $result  = $builder->buildObjectRepresentation($parent);
 
-        $expected = array(
-            'firstName'  => 'first',
-            'lastName'   => 'last',
-            'age'        => 20,
-            'publicTest' => 'public',
-            'children'   => array()
-        );
+        $expected = new \stdClass();
+        $expected->firstName  = 'first';
+        $expected->lastName   = 'last';
+        $expected->age        = 20;
+        $expected->publicTest = 'public';
+        $expected->children   = array();
 
         $this->assertEquals($expected, $result);
     }
@@ -32,19 +31,17 @@ class GenericRepresentationBuilderTest extends \PHPUnit_Framework_TestCase
         $builder = new GenericRepresentationBuilder();
         $result  = $builder->buildObjectRepresentation($parent);
 
-        $expected = array(
-            'firstName' => 'first',
-            'lastName'  => 'last',
-            'age'       => 20,
-            'publicTest'=> 'public',
-            'children'  => array(
-                0 => array(
-                    'firstName' => 'first',
-                    'lastName'  => 'last',
-                    'toys'      => array()
-                )
-            )
-        );
+        $childResult            = new \stdClass();
+        $childResult->firstName = 'first';
+        $childResult->lastName  = 'last';
+        $childResult->toys      = array();
+
+        $expected = new \stdClass();
+        $expected->firstName = 'first';
+        $expected->lastName  = 'last';
+        $expected->age =        20;
+        $expected->publicTest = 'public';
+        $expected->children  = array ($childResult);
 
         $this->assertEquals($expected, $result);
     }
@@ -57,25 +54,23 @@ class GenericRepresentationBuilderTest extends \PHPUnit_Framework_TestCase
         $builder = new GenericRepresentationBuilder();
         $result  = $builder->buildObjectRepresentation($parent);
 
-        $expected = array(
-            'firstName' => 'first',
-            'lastName'  => 'last',
-            'age'       => 20,
-            'publicTest' => array(
-                1,
-                2,
-                array(
-                    3,4
-                ),
+        $childResult = new \stdClass();
+        $childResult->firstName = 'first';
+        $childResult->lastName  = 'last';
+        $childResult->toys      = array();
+
+        $expected = new \stdClass();
+        $expected->firstName = 'first';
+        $expected->lastName  = 'last';
+        $expected->age       = 20;
+        $expected->publicTest = array(
+            1,
+            2,
+            array(
+                3,4
             ),
-            'children' => array(
-                0 => array(
-                    'firstName' => 'first',
-                    'lastName'  => 'last',
-                    'toys'      => array()
-                )
-            )
         );
+        $expected->children = array($childResult);
 
         $this->assertEquals($expected, $result);
     }
@@ -91,32 +86,28 @@ class GenericRepresentationBuilderTest extends \PHPUnit_Framework_TestCase
         $builder = new GenericRepresentationBuilder();
         $result  = $builder->buildObjectRepresentation($parent);
 
-        $expected = array(
-            'firstName' => 'first',
-            'lastName'  => 'last',
-            'age'       => 20,
-            'publicTest' => array(
-                1,
-                2,
-                array(
-                    3,4
-                ),
-            ),
-            'children' => array(
-                0 => array(
-                    'firstName' => 'first',
-                    'lastName'  => 'last',
-                    'toys'      => array(
-                        0 => array(
-                            'color' => 'red',
-                            'name'  => 'joe',
-                            'sound' => 'vhroom'
+        $toyResult = new \stdClass();
+        $toyResult->color = 'red';
+        $toyResult->name  = 'joe';
+        $toyResult->sound = 'vhroom';
 
-                        )
-                    )
-                )
-            )
+        $childResult = new \stdClass();
+        $childResult->firstName = 'first';
+        $childResult->lastName = 'last';
+        $childResult->toys = array($toyResult);
+
+        $expected = new \stdClass();
+        $expected->firstName = 'first';
+        $expected->lastName  = 'last';
+        $expected->age       = 20;
+        $expected->publicTest = array(
+            1,
+            2,
+            array(
+                3,4
+            ),
         );
+        $expected->children = array($childResult);
 
         $this->assertEquals($expected, $result);
     }
@@ -127,15 +118,13 @@ class GenericRepresentationBuilderTest extends \PHPUnit_Framework_TestCase
         $builder = new GenericRepresentationBuilder();
         $result  = $builder->buildObjectRepresentation($parent);
 
-        $expected = array(
-            'firstName'  => null,
-            'lastName'   => null,
-            'age'        => null,
-            'publicTest' => null,
-            'children'   => array()
-        );
+        $expected = new \stdClass();
+        $expected->firstName  = null;
+        $expected->lastName   = null;
+        $expected->age        = null;
+        $expected->publicTest = null;
+        $expected->children   = array();
 
         $this->assertEquals($expected, $result);
     }
-
 }
