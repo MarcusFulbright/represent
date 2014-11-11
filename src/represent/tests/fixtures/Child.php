@@ -4,7 +4,7 @@
 namespace represent\tests\fixtures;
 
 
-class ChildTest 
+class Child
 {
     private $firstName;
 

@@ -4,7 +4,7 @@ namespace represent\tests\fixtures;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
-class ParentTest
+class Adult
 {
     private $firstName;
 
@@ -90,9 +90,9 @@ class ParentTest
     }
 
     /**
-     * @param ChildTest $child
+     * @param Child $child
      */
-    public function  addChild(ChildTest $child)
+    public function  addChild(Child $child)
     {
         $this->children->add($child);
     }
