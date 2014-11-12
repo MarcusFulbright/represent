@@ -16,23 +16,21 @@ class GenericRepresentationBuilder
 {
     public function buildRepresentation($object)
     {
-        if ($this->checkArrayCollection($object)) {
-
-            $object = $object->toArray();
-        }
-
-        if (is_object($object)) {
-
-            $output = $this->handleObject($object);
-
-        } elseif (is_array($object)) {
-
-            $output = $this->handleArray($object);
-
-        } else {
-
-            throw new \Exception('Can only build Representations for objects, arrays, and Doctrine\ArrayCollection');
-        }
+        switch (true):
+            case $this->checkArrayCollection($object):
+                $object = $object->toArray();
+            case is_array($object):
+                $output = $this->handleArray($object);
+                break;
+            case is_object($object):
+                $output = $this->handleObject($object);
+                break;
+            case is_null($object);
+                $output = array();
+                break;
+            default:
+                throw new \Exception('Can only build Representations for objects, arrays, null, and Doctrine\ArrayCollection');
+            endswitch;
 
         return $output;
     }
@@ -46,33 +44,37 @@ class GenericRepresentationBuilder
 
     private function handleProperties(\ReflectionClass $reflection, $original)
     {
-        $output = new \stdClass();
+        $output     = new \stdClass();
+        $callback   = array($this, 'walkProperty');
+        $properties = $reflection->getProperties();
 
-        foreach ($reflection->getProperties() as $property)
-        {
-            $property->setAccessible(true);
-            $name  = $property->getName();
-            $value = $property->getValue($original);
+        array_walk($properties, $callback, array($original, $output));
 
-            if ($this->checkArrayCollection($value)) {
+        return $output;
+    }
 
+    private function walkProperty(\ReflectionProperty $property, $key, $args)
+    {
+        $property->setAccessible(true);
+
+        $original = $args[0];
+        $output   = $args[1];
+        $name     = $property->getName();
+        $value    = $property->getValue($original);
+
+        switch (true):
+            case $this->checkArrayCollection($value):
                 $value = $value->toArray();
-            }
-
-            if (is_array($value)) {
-
+            case is_array($value);
                 $output = $this->parseArray($name, $value, $output);
-
-            } elseif(is_object($value)){
-
+                break;
+            case is_object($value);
                 $output->$name = $this->handleObject($value);
-
-            } else {
-
+                break;
+            default:
                 $output->$name = $value;
-
-            }
-        }
+                break;
+        endswitch;
 
         return $output;
     }
@@ -86,30 +88,25 @@ class GenericRepresentationBuilder
 
     private function handleArray(array $object)
     {
-        $output = array();
+        $output   = array();
 
         foreach ($object as $key => $value) {
-            if ($this->checkArrayCollection($value)) {
-                $value->toArray();
-            }
-
-            if (is_array($value)) {
-
-                $output[$key] = $this->handleArray($value);
-
-            } elseif (is_object($value)) {
-
-                $output[$key] = $this->handleObject($value);
-
-            } else{
-                $output[$key] = $value;
-
-            }
+            switch (true):
+                case $this->checkArrayCollection($value):
+                    $value->toArray();
+                case is_array($value):
+                    $output[$key] = $this->handleArray($value);
+                    break;
+                case is_object($value):
+                    $output[$key] = $this->handleObject($value);
+                    break;
+                default:
+                    $output[$key] = $value;
+            endswitch;
         }
 
         return $output;
     }
-
 
     private function parseArray($name, array $values, $output)
     {
