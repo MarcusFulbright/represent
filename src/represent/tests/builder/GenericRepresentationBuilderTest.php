@@ -127,4 +127,27 @@ class GenericRepresentationBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($expected, $result);
     }
+
+    public function testBuildObjectRepresentationWithObjectAsProperty()
+    {
+        $object = new Toy('red', 'car', 'vhroom');
+
+        $parent  = new Adult('first', 'last', 20, $object);
+        $builder = new GenericRepresentationBuilder();
+        $result  = $builder->buildObjectRepresentation($parent);
+
+        $objectResult = new \stdClass();
+        $objectResult->color = 'red';
+        $objectResult->name = 'car';
+        $objectResult->sound = 'vhroom';
+
+        $expected = new \stdClass();
+        $expected->firstName  = 'first';
+        $expected->lastName   = 'last';
+        $expected->publicTest = $objectResult;
+        $expected->age        = 20;
+        $expected->children   = array();
+
+        $this->assertEquals($expected, $result);
+    }
 }

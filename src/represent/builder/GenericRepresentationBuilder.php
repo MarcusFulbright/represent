@@ -42,12 +42,19 @@ class GenericRepresentationBuilder
             }
 
             if (is_array($value)) {
+
                 $output = $this->handleArray($name, $value, $output);
+
+            } elseif(is_object($value)){
+
+                $output->$name = $this->buildObjectRepresentation($value);
+
             } else {
+
                 $output->$name = $value;
+
             }
         }
-
         return $output;
     }
 
