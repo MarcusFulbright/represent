@@ -2,7 +2,9 @@
 
 namespace Represent\Tests\Builder;
 
+use Doctrine\Common\Annotations\AnnotationReader;
 use Represent\Builder\GenericRepresentationBuilder;
+use Represent\Factory\MetaDataFactory;
 use Represent\Tests\Fixtures\Adult;
 use Represent\Tests\Fixtures\Child;
 use Represent\Tests\Fixtures\Toy;
@@ -12,7 +14,7 @@ class GenericRepresentationBuilderTest extends \PHPUnit_Framework_TestCase
     public function testBuildRepresentationSimple()
     {
         $parent  = new Adult('first', 'last', 20, 'public');
-        $builder = new GenericRepresentationBuilder();
+        $builder = $this->getGenericRepresentationBuilder();
         $result  = $builder->buildRepresentation($parent);
 
         $expected = new \stdClass();
@@ -22,6 +24,9 @@ class GenericRepresentationBuilderTest extends \PHPUnit_Framework_TestCase
         $expected->publicTest = 'public';
         $expected->children   = array();
 
+//        var_dump($result->children);
+//        die();
+
         $this->assertEquals($expected, $result);
     }
 
@@ -30,7 +35,7 @@ class GenericRepresentationBuilderTest extends \PHPUnit_Framework_TestCase
         $parent = new Adult('first', 'last', 20, 'public');
         $parent->addChild(new Child('first', 'last'));
 
-        $builder = new GenericRepresentationBuilder();
+        $builder = $this->getGenericRepresentationBuilder();
         $result  = $builder->buildRepresentation($parent);
 
         $childResult            = new \stdClass();
@@ -53,7 +58,7 @@ class GenericRepresentationBuilderTest extends \PHPUnit_Framework_TestCase
         $parent = new Adult('first', 'last', 20, array(1,2,array(3,4)));
         $parent->addChild(new Child('first', 'last'));
 
-        $builder = new GenericRepresentationBuilder();
+        $builder = $this->getGenericRepresentationBuilder();
         $result  = $builder->buildRepresentation($parent);
 
         $childResult = new \stdClass();
@@ -85,7 +90,7 @@ class GenericRepresentationBuilderTest extends \PHPUnit_Framework_TestCase
         $parent = new Adult('first', 'last', 20, array(1,2,array(3,4)));
         $parent->addChild($child);
 
-        $builder = new GenericRepresentationBuilder();
+        $builder = $this->getGenericRepresentationBuilder();
         $result  = $builder->buildRepresentation($parent);
 
         $toyResult = new \stdClass();
@@ -119,7 +124,7 @@ class GenericRepresentationBuilderTest extends \PHPUnit_Framework_TestCase
         $object = new Toy('red', 'car', 'vhroom');
 
         $parent  = new Adult('first', 'last', 20, $object);
-        $builder = new GenericRepresentationBuilder();
+        $builder = $this->getGenericRepresentationBuilder();
         $result  = $builder->buildRepresentation($parent);
 
         $objectResult = new \stdClass();
@@ -141,7 +146,7 @@ class GenericRepresentationBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $parent  = new Adult('first', 'last', 20, 'public');
         $parent2 = new Adult('first', 'last', 20, 'public');
-        $builder = new GenericRepresentationBuilder();
+        $builder = $this->getGenericRepresentationBuilder();
         $result = $builder->buildRepresentation(array($parent, $parent2));
 
         $parentResult = new \stdClass();
@@ -162,7 +167,7 @@ class GenericRepresentationBuilderTest extends \PHPUnit_Framework_TestCase
     public function testBuildRepresentationWithSimpleArray()
     {
         $test = array(1,2,3);
-        $builder = new GenericRepresentationBuilder();
+        $builder =  $this->getGenericRepresentationBuilder();
         $result = $builder->buildRepresentation($test);
 
         $this->assertEquals($test, $result);
@@ -182,7 +187,7 @@ class GenericRepresentationBuilderTest extends \PHPUnit_Framework_TestCase
             'key3' => 3
         );
 
-        $builder = new GenericRepresentationBuilder();
+        $builder = $this->getGenericRepresentationBuilder();
         $result  = $builder->buildRepresentation(array($parent, $testKeys));
 
         $toyResult = new \stdClass();
@@ -216,7 +221,7 @@ class GenericRepresentationBuilderTest extends \PHPUnit_Framework_TestCase
     public function testBuildRepresentationNullValues()
     {
         $parent  = new Adult(null, null, null, null);
-        $builder = new GenericRepresentationBuilder();
+        $builder = $this->getGenericRepresentationBuilder();
         $result  = $builder->buildRepresentation($parent);
 
         $expected = new \stdClass();
@@ -232,7 +237,7 @@ class GenericRepresentationBuilderTest extends \PHPUnit_Framework_TestCase
     public function testCanBuildRepresentationForPrimitiveString()
     {
         $test    = 'I am a string';
-        $builder = new GenericRepresentationBuilder();
+        $builder = $this->getGenericRepresentationBuilder();
         $result  = $builder->buildRepresentation($test);
 
         $this->assertEquals($test, $result);
@@ -241,7 +246,7 @@ class GenericRepresentationBuilderTest extends \PHPUnit_Framework_TestCase
     public function testCanBuildRepresentationForPrimitiveInteger()
     {
         $test    = 1;
-        $builder = new GenericRepresentationBuilder();
+        $builder = $this->getGenericRepresentationBuilder();
         $result  = $builder->buildRepresentation($test);
 
         $this->assertEquals($test, $result);
@@ -250,9 +255,14 @@ class GenericRepresentationBuilderTest extends \PHPUnit_Framework_TestCase
     public function testCanBuildRepresentationForPrimitiveBool()
     {
         $test    = true;
-        $builder = new GenericRepresentationBuilder();
+        $builder = $this->getGenericRepresentationBuilder();
         $result  = $builder->buildRepresentation($test);
 
         $this->assertEquals($test, $result);
+    }
+
+    private function getGenericRepresentationBuilder()
+    {
+        return new GenericRepresentationBuilder(new AnnotationReader(), new MetaDataFactory());
     }
 }

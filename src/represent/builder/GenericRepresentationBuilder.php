@@ -3,6 +3,8 @@
 namespace Represent\Builder;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Represent\Enum\PropertyTypeEnum;
+use Represent\Factory\MetaDataFactory;
 
 /**
  * Builds a generic representation of an object that is format agnostic.
@@ -11,6 +13,22 @@ use Doctrine\Common\Annotations\AnnotationReader;
  */
 class GenericRepresentationBuilder
 {
+    /**
+     * @var \Doctrine\Common\Annotations\AnnotationReader
+     */
+    private $reader;
+
+    /**
+     * @var \Represent\Factory\MetaDataFactory
+     */
+    private $factory;
+
+    public function __construct(AnnotationReader $reader, MetaDataFactory $factory)
+    {
+        $this->reader  = $reader;
+        $this->factory = $factory;
+    }
+
     public function buildRepresentation($object)
     {
         switch (true):
@@ -44,16 +62,10 @@ class GenericRepresentationBuilder
     private function handleObject($object)
     {
         $reflection = new \ReflectionClass($object);
-
-        return $this->handleProperties($reflection, $object);
-    }
-
-    private function handleProperties(\ReflectionClass $reflection, $original)
-    {
         $output = new \stdClass();
 
         foreach ($reflection->getProperties() as $property) {
-            $this->handleProperty($property, $original, $output);
+            $output = $this->handleProperty($property, $object, $output);
         }
 
         return $output;
@@ -61,15 +73,15 @@ class GenericRepresentationBuilder
 
     private function handleProperty(\ReflectionProperty $property, $original, $output)
     {
-        $property->setAccessible(true);
-        $name  = $property->getName();
-        $value = $property->getValue($original);
+        $metaData = $this->factory->propertyMetaFromReflection($property, $original);
+        $value    = $metaData->value;
+        $name     = $metaData->name;
 
         switch (true):
             case $this->checkArrayCollection($value):
                 $value = $value->toArray();
             case is_array($value);
-                $output = $this->parseArray($name, $value, $output);
+                $output->$name = $this->handleArray($value);
                 break;
             case is_object($value);
                 $output->$name = $this->handleObject($value);
@@ -92,11 +104,8 @@ class GenericRepresentationBuilder
     private function handleArray(array $object)
     {
         $output   = array();
-
         foreach ($object as $key => $value) {
-            switch (true):
-                case $this->checkArrayCollection($value):
-                    $value->toArray();
+            switch (true):;
                 case is_array($value):
                     $output[$key] = $this->handleArray($value);
                     break;
@@ -106,26 +115,6 @@ class GenericRepresentationBuilder
                 default:
                     $output[$key] = $value;
             endswitch;
-        }
-
-        return $output;
-    }
-
-    private function parseArray($name, array $values, $output)
-    {
-        $parsed = array();
-
-        foreach ($values as $value) {
-            if (is_object($value)){
-                $parsed[] = $this->handleObject($value);
-            } else {
-                $parsed[] = $value;
-            }
-        }
-        if ($name) {
-            $output->$name = $parsed;
-
-            return $output;
         }
 
         return $output;
