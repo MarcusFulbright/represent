@@ -5,9 +5,6 @@ namespace Represent\Builder;
 use Doctrine\Common\Annotations\AnnotationReader;
 
 /**
- * Class GenericRepresentationBuilder
- * @package represent\builder
- *
  * Builds a generic representation of an object that is format agnostic.
  *
  * @author Marcus Fulbright <fulbright.marcus@gmail.com>
@@ -53,23 +50,20 @@ class GenericRepresentationBuilder
 
     private function handleProperties(\ReflectionClass $reflection, $original)
     {
-        $output     = new \stdClass();
-        $callback   = array($this, 'walkProperty');
-        $properties = $reflection->getProperties();
+        $output = new \stdClass();
 
-        array_walk($properties, $callback, array($original, $output));
+        foreach ($reflection->getProperties() as $property) {
+            $this->handleProperty($property, $original, $output);
+        }
 
         return $output;
     }
 
-    private function walkProperty(\ReflectionProperty $property, $key, $args)
+    private function handleProperty(\ReflectionProperty $property, $original, $output)
     {
         $property->setAccessible(true);
-
-        $original = $args[0];
-        $output   = $args[1];
-        $name     = $property->getName();
-        $value    = $property->getValue($original);
+        $name  = $property->getName();
+        $value = $property->getValue($original);
 
         switch (true):
             case $this->checkArrayCollection($value):
