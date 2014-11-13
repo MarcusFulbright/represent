@@ -4,7 +4,7 @@ namespace Represent\Tests\Builder;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Represent\Builder\GenericRepresentationBuilder;
-use Represent\Factory\MetaDataFactory;
+use Represent\Builder\PropertyMetaDataBuilder;
 use Represent\Tests\Fixtures\Adult;
 use Represent\Tests\Fixtures\Child;
 use Represent\Tests\Fixtures\Toy;
@@ -23,9 +23,6 @@ class GenericRepresentationBuilderTest extends \PHPUnit_Framework_TestCase
         $expected->age        = 20;
         $expected->publicTest = 'public';
         $expected->children   = array();
-
-//        var_dump($result->children);
-//        die();
 
         $this->assertEquals($expected, $result);
     }
@@ -263,6 +260,6 @@ class GenericRepresentationBuilderTest extends \PHPUnit_Framework_TestCase
 
     private function getGenericRepresentationBuilder()
     {
-        return new GenericRepresentationBuilder(new AnnotationReader(), new MetaDataFactory());
+        return new GenericRepresentationBuilder(new PropertyMetaDataBuilder(new AnnotationReader()));
     }
 }

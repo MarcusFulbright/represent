@@ -3,8 +3,6 @@
 namespace Represent\Builder;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use Represent\Enum\PropertyTypeEnum;
-use Represent\Factory\MetaDataFactory;
 
 /**
  * Builds a generic representation of an object that is format agnostic.
@@ -14,19 +12,13 @@ use Represent\Factory\MetaDataFactory;
 class GenericRepresentationBuilder
 {
     /**
-     * @var \Doctrine\Common\Annotations\AnnotationReader
+     * @var \Represent\Builder\PropertyMetaDataBuilder
      */
-    private $reader;
+    private $propertyBuilder;
 
-    /**
-     * @var \Represent\Factory\MetaDataFactory
-     */
-    private $factory;
-
-    public function __construct(AnnotationReader $reader, MetaDataFactory $factory)
+    public function __construct(PropertyMetaDataBuilder $propertyBuilder)
     {
-        $this->reader  = $reader;
-        $this->factory = $factory;
+        $this->propertyBuilder = $propertyBuilder;
     }
 
     public function buildRepresentation($object)
@@ -53,7 +45,7 @@ class GenericRepresentationBuilder
                 $output = $object;
                 break;
             default:
-                throw new \Exception('Can only build Representations for objects, arrays, null, and Doctrine\ArrayCollection');
+                throw new \Exception('Can not determine how to build representation');
             endswitch;
 
         return $output;
@@ -73,7 +65,7 @@ class GenericRepresentationBuilder
 
     private function handleProperty(\ReflectionProperty $property, $original, $output)
     {
-        $metaData = $this->factory->propertyMetaFromReflection($property, $original);
+        $metaData = $this->propertyBuilder->propertyMetaFromReflection($property, $original);
         $value    = $metaData->value;
         $name     = $metaData->name;
 

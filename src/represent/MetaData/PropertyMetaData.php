@@ -6,14 +6,14 @@ class PropertyMetaData
 {
     public $name;
 
-    public $class;
-
     public $value;
+
+    public $class;
 
     public function __construct($name, $value, $class)
     {
-        $this->name  = $name;
-        $this->value = $value;
+        $this->name = $name;
         $this->class = $class;
+        $this->value = $value;
     }
 }

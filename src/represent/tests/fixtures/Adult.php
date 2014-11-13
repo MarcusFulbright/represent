@@ -4,6 +4,8 @@ namespace Represent\Tests\Fixtures;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Represent\Annotations as Represent;
+
 class Adult
 {
     private $firstName;
@@ -18,11 +20,11 @@ class Adult
 
     public function __construct($firstName = null, $lastName = null, $age = null, $publicTest = null)
     {
-        $this->firstName   = $firstName;
-        $this->lastName    = $lastName;
-        $this->age         = $age;
-        $this->publicTest  = $publicTest;
-        $this->children    = new ArrayCollection();
+        $this->firstName    = $firstName;
+        $this->lastName     = $lastName;
+        $this->age          = $age;
+        $this->publicTest   = $publicTest;
+        $this->children     = new ArrayCollection();
     }
 
     /**
