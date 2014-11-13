@@ -7,6 +7,12 @@ use Represent\Annotations\Property;
 use Represent\Enum\PropertyTypeEnum;
 use Represent\MetaData\PropertyMetaData;
 
+/**
+ * Responsible for building representations of class properties
+ *
+ * Class PropertyMetaDataBuilder
+ * @package Represent\Builder
+ */
 class PropertyMetaDataBuilder
 {
     private $annotaitonReader;
@@ -16,6 +22,13 @@ class PropertyMetaDataBuilder
         $this->annotaitonReader = $annotationReader;
     }
 
+    /**
+     * Responsible for building property representation from \ReflectionProperties in the form of PropertyMetaData
+     *
+     * @param \ReflectionProperty $property
+     * @param $original
+     * @return PropertyMetaData
+     */
     public function propertyMetaFromReflection(\ReflectionProperty $property, $original)
     {
         $property->setAccessible(true);
@@ -23,6 +36,14 @@ class PropertyMetaDataBuilder
         return $this->parseAnnotations($meta, $property, $original);
     }
 
+    /**
+     * Parses properties for annotations and delegates the handling of those annotaitons
+     *
+     * @param PropertyMetaData $meta
+     * @param \ReflectionProperty $property
+     * @param $original
+     * @return PropertyMetaData
+     */
     private function parseAnnotations(PropertyMetaData $meta, \ReflectionProperty $property, $original)
     {
         foreach ($this->annotaitonReader->getPropertyAnnotations($property) as $annot) {
@@ -35,6 +56,15 @@ class PropertyMetaDataBuilder
         return $meta;
     }
 
+    /**
+     * Handles dealing with Represent\Property annotation
+     *
+     * @param \ReflectionProperty $property
+     * @param Property $annot
+     * @param PropertyMetaData $meta
+     * @param $original
+     * @return PropertyMetaData
+     */
     private function handleRepresentProperty(\ReflectionProperty $property, Property $annot, PropertyMetaData $meta, $original)
     {
         if ($annot->getName()) {
@@ -48,6 +78,12 @@ class PropertyMetaDataBuilder
         return $meta;
     }
 
+    /**
+     * Handles dealing with type conversion for the Represent\Property annotation
+     * @param $type
+     * @param $value
+     * @return bool|\DateTime|int|string
+     */
     private function handleTypeConversion($type, $value)
     {
         switch ($type):

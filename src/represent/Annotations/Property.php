@@ -5,6 +5,8 @@ namespace Represent\Annotations;
 use Represent\Enum\PropertyTypeEnum;
 
 /**
+ * Used to control the serialized name and data type
+ *
  * @Annotation
  * @Target({"PROPERTY"})
  */

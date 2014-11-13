@@ -21,6 +21,14 @@ class GenericRepresentationBuilder
         $this->propertyBuilder = $propertyBuilder;
     }
 
+    /**
+     * Entry point to build a generic representation. Will handle parse an object and return only stdClass, and arrays
+     * with keys and values
+     *
+     * @param $object
+     * @return array|\stdClass
+     * @throws \Exception
+     */
     public function buildRepresentation($object)
     {
         switch (true):
@@ -51,6 +59,12 @@ class GenericRepresentationBuilder
         return $output;
     }
 
+    /**
+     * Used to handle representing objects
+     *
+     * @param $object
+     * @return \stdClass
+     */
     private function handleObject($object)
     {
         $reflection = new \ReflectionClass($object);
@@ -63,6 +77,14 @@ class GenericRepresentationBuilder
         return $output;
     }
 
+    /**
+     * Used to handle determining representing object properties
+     *
+     * @param \ReflectionProperty $property
+     * @param $original
+     * @param $output
+     * @return mixed
+     */
     private function handleProperty(\ReflectionProperty $property, $original, $output)
     {
         $metaData = $this->propertyBuilder->propertyMetaFromReflection($property, $original);
@@ -86,6 +108,12 @@ class GenericRepresentationBuilder
         return $output;
     }
 
+    /**
+     * Returns true if object is an instanceof array collection
+     *
+     * @param $object
+     * @return bool
+     */
     private function checkArrayCollection($object)
     {
         $class = 'Doctrine\Common\Collections\ArrayCollection';
@@ -93,6 +121,12 @@ class GenericRepresentationBuilder
         return $object instanceof $class;
     }
 
+    /**
+     * Can handle representing an array
+     *
+     * @param array $object
+     * @return array
+     */
     private function handleArray(array $object)
     {
         $output   = array();

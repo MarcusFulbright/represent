@@ -2,6 +2,10 @@
 
 namespace Represent\MetaData;
 
+/**
+ * Value object that can be used to supplement \ReflectionProperty. This allows for more maniuplation
+ *
+ */
 class PropertyMetaData 
 {
     public $name;
