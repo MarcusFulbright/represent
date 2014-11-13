@@ -13,9 +13,10 @@
     ],
     "require": {
         "php": ">=5.3.9",
-        "doctrine/common": "2.3.*"
+        "doctrine/common": "2.3.*",
+        "mockery/mockery": "~0.9"
     },
     "autoload": {
-        "psr-0": { "represent\\": "src/" }
+        "psr-0": { "Represent\\": "src/" }
     }
 }

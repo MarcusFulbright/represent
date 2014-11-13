@@ -1,9 +1,11 @@
 <?php
 
-use represent\builder\GenericRepresentationBuilder;
-use represent\tests\fixtures\Adult;
-use represent\tests\fixtures\Child;
-use represent\tests\fixtures\Toy;
+namespace Represent\Tests\Builder;
+
+use Represent\Builder\GenericRepresentationBuilder;
+use Represent\Tests\Fixtures\Adult;
+use Represent\Tests\Fixtures\Child;
+use Represent\Tests\Fixtures\Toy;
 
 class GenericRepresentationBuilderTest extends \PHPUnit_Framework_TestCase
 {

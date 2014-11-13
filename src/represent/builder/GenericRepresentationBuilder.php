@@ -1,6 +1,6 @@
 <?php
 
-namespace represent\builder;
+namespace Represent\Builder;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 
@@ -123,7 +123,6 @@ class GenericRepresentationBuilder
 
         foreach ($values as $value) {
             if (is_object($value)){
-
                 $parsed[] = $this->handleObject($value);
             } else {
                 $parsed[] = $value;

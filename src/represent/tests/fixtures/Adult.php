@@ -1,6 +1,6 @@
 <?php
 
-namespace represent\tests\fixtures;
+namespace Represent\Tests\Fixtures;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
