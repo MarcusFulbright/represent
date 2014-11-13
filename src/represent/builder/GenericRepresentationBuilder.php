@@ -25,8 +25,17 @@ class GenericRepresentationBuilder
             case is_object($object):
                 $output = $this->handleObject($object);
                 break;
-            case is_null($object);
+            case is_null($object):
                 $output = array();
+                break;
+            case is_string($object):
+                $output = $object;
+                break;
+            case is_integer($object):
+                $output = $object;
+                break;
+            case is_bool($object):
+                $output = $object;
                 break;
             default:
                 throw new \Exception('Can only build Representations for objects, arrays, null, and Doctrine\ArrayCollection');

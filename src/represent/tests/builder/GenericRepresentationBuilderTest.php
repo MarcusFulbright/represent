@@ -7,7 +7,7 @@ use represent\tests\fixtures\Toy;
 
 class GenericRepresentationBuilderTest extends \PHPUnit_Framework_TestCase
 {
-    public function testBuildObjectRepresentationSimple()
+    public function testBuildRepresentationSimple()
     {
         $parent  = new Adult('first', 'last', 20, 'public');
         $builder = new GenericRepresentationBuilder();
@@ -23,7 +23,7 @@ class GenericRepresentationBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function testBuildObjectRepresentationWithChildren()
+    public function testBuildRepresentationWithChildren()
     {
         $parent = new Adult('first', 'last', 20, 'public');
         $parent->addChild(new Child('first', 'last'));
@@ -46,7 +46,7 @@ class GenericRepresentationBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function testBuildObjectRepresentationWithNormalArray()
+    public function testBuildRepresentationWithNormalArray()
     {
         $parent = new Adult('first', 'last', 20, array(1,2,array(3,4)));
         $parent->addChild(new Child('first', 'last'));
@@ -75,7 +75,7 @@ class GenericRepresentationBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function testBuildObjectRepresentationDeepNesting()
+    public function testBuildRepresentationDeepNesting()
     {
         $child = new Child('first', 'last');
         $child->addToy(new Toy('red', 'joe', 'vhroom'));
@@ -112,7 +112,7 @@ class GenericRepresentationBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function testBuildObjectRepresentationWithObjectAsProperty()
+    public function testBuildRepresentationWithObjectAsProperty()
     {
         $object = new Toy('red', 'car', 'vhroom');
 
@@ -211,7 +211,7 @@ class GenericRepresentationBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function testBuildObjectRepresentationNullValues()
+    public function testBuildRepresentationNullValues()
     {
         $parent  = new Adult(null, null, null, null);
         $builder = new GenericRepresentationBuilder();
@@ -225,5 +225,32 @@ class GenericRepresentationBuilderTest extends \PHPUnit_Framework_TestCase
         $expected->children   = array();
 
         $this->assertEquals($expected, $result);
+    }
+
+    public function testCanBuildRepresentationForPrimitiveString()
+    {
+        $test    = 'I am a string';
+        $builder = new GenericRepresentationBuilder();
+        $result  = $builder->buildRepresentation($test);
+
+        $this->assertEquals($test, $result);
+    }
+
+    public function testCanBuildRepresentationForPrimitiveInteger()
+    {
+        $test    = 1;
+        $builder = new GenericRepresentationBuilder();
+        $result  = $builder->buildRepresentation($test);
+
+        $this->assertEquals($test, $result);
+    }
+
+    public function testCanBuildRepresentationForPrimitiveBool()
+    {
+        $test    = true;
+        $builder = new GenericRepresentationBuilder();
+        $result  = $builder->buildRepresentation($test);
+
+        $this->assertEquals($test, $result);
     }
 }
