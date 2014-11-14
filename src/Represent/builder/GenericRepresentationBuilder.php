@@ -138,7 +138,7 @@ class GenericRepresentationBuilder
      */
     private function handleArray(array $object)
     {
-        $output   = array();
+        $output = array();
         foreach ($object as $key => $value) {
             switch (true):;
                 case is_array($value):

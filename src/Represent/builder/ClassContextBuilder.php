@@ -70,13 +70,20 @@ class ClassContextBuilder
      */
     private function generatePropertiesForBlackList(\ReflectionClass $reflection, ClassContext $context)
     {
-        foreach ($reflection->getProperties() as $property) {
-            foreach ($this->annotationReader->getPropertyAnnotations($property) as $annot) {
-                if ($annot instanceof \Represent\Annotations\Show) {
-                    $context[] = $property;
-                }
+        array_walk(
+            $reflection->getProperties(),
+            function ($property) use ($context) {
+                $annotations = $this->annotationReader->getPropertyAnnotations($property);
+                array_walk(
+                    $annotations,
+                    function ($annot) use ($property) {
+                        if ($annot instanceof \Represent\Annotations\Show) {
+                            $context[] = $property;
+                        }
+                    }
+                );
             }
-        }
+        );
 
         return $context;
     }
@@ -90,19 +97,24 @@ class ClassContextBuilder
      */
     private function generatePropertiesForWhiteList(\ReflectionClass $reflection, ClassContext $context)
     {
-        foreach ($reflection->getProperties() as $property) {
-            $annotations = $this->annotationReader->getPropertyAnnotations($property);
+        $properties = $reflection->getProperties();
+        $reader     = $this->annotationReader;
 
-            if (empty($annotations)) {
-                $context->properties[] = $property;
-            } else {
-                foreach($annotations as $annot) {
-                    if (!$annot instanceof \Represent\Annotations\Hide) {
-                        $context->properties[] = $property;
+        array_walk(
+            $properties,
+            function ($property) use ($context, $reader) {
+                $annotations = $reader->getPropertyAnnotations($property);
+                $filtered = array_filter(
+                    $annotations,
+                    function ($annot) {
+                        return $annot instanceof \Represent\Annotations\Hide;
                     }
+                );
+                if (!is_null($filtered)) {
+                    $context->properties[] = $property;
                 }
             }
-        }
+        );
 
         return $context;
     }
