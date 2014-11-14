@@ -3,7 +3,7 @@
 namespace Represent\MetaData;
 
 /**
- * Value object that can be used to supplement \ReflectionProperty. This allows for more maniuplation
+ * Value object that can be used to supplement \ReflectionProperty. This allows for more manipulation
  *
  */
 class PropertyMetaData 

@@ -3,13 +3,13 @@
 namespace Represent\Builder;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use Represent\Context\ClassContext;
+use Represent\MetaData\ClassMetaData;
 use Represent\Enum\ExclusionPolicyEnum;
 
 /**
- * Builds class context objects. Handles parsing properties according to exclusion policies.
+ * Builds ClassMetaData objects. Handles parsing properties according to exclusion policies.
  */
-class ClassContextBuilder
+class ClassMetaDataBuilder
 {
     /**
      * @var \Doctrine\Common\Annotations\AnnotationReader
@@ -27,112 +27,112 @@ class ClassContextBuilder
     /**
      * Entry point to build the class context object. Currently only knows how to handle exclusion policy.
      * Any new top level class annotations need a handler in here.
-
+     *
      * @param \ReflectionClass $reflection
      * @param                  $group
-     * @return array|ClassContext
+     * @return array|ClassMetaData
      */
-    public function buildClassContext(\ReflectionClass $reflection, $group)
+    public function buildClassMetaData(\ReflectionClass $reflection, $group)
     {
-        $context = new ClassContext();
-        $context = $this->handleExclusionPolicy($reflection, $context);
+        $classMeta = new ClassMetaData();
+        $classMeta = $this->handleExclusionPolicy($reflection, $classMeta);
 
         if ($group) {
-            $context->group = $group;
-            $context = $this->handleGroup($context);
+            $classMeta->group = $group;
+            $classMeta = $this->handleGroup($classMeta);
         }
 
-        return $context;
+        return $classMeta;
     }
 
     /**
      * Determines exclusion policy and hands off to the appropriate method. Defaults to white list
      *
      * @param \ReflectionClass $reflection
-     * @param ClassContext     $context
-     * @return array|ClassContext
+     * @param ClassMetaData     $classMeta
+     * @return array|ClassMetaData
      */
-    private function handleExclusionPolicy(\ReflectionClass $reflection, ClassContext $context)
+    private function handleExclusionPolicy(\ReflectionClass $reflection, ClassMetaData $classMeta)
     {
         $annot = $this->annotationReader->getClassAnnotation($reflection, '\Represent\Annotations\ExclusionPolicy');
 
         if (!is_null($annot) && $annot->getPolicy() === ExclusionPolicyEnum::BLACKLIST){
-            $context->policy = ExclusionPolicyEnum::BLACKLIST;
-            $context = $this->generatePropertiesForBlackList($reflection, $context);
+            $classMeta->policy = ExclusionPolicyEnum::BLACKLIST;
+            $classMeta = $this->generatePropertiesForBlackList($reflection, $classMeta);
         } else {
-            $context->policy = ExclusionPolicyEnum::WHITELIST;
-            $context = $this->generatePropertiesForWhiteList($reflection, $context);
+            $classMeta->policy = ExclusionPolicyEnum::WHITELIST;
+            $classMeta = $this->generatePropertiesForWhiteList($reflection, $classMeta);
         }
 
-        return $context;
+        return $classMeta;
     }
 
     /**
      * Decides what properties should be represented using the black list policy
      *
      * @param \ReflectionClass $reflection
-     * @param ClassContext     $context
-     * @return array|ClassContext
+     * @param ClassMetaData     $classMeta
+     * @return array|ClassMetaData
      */
-    private function generatePropertiesForBlackList(\ReflectionClass $reflection, ClassContext $context)
+    private function generatePropertiesForBlackList(\ReflectionClass $reflection, ClassMetaData $classMeta)
     {
         array_walk(
             $reflection->getProperties(),
-            function ($property) use ($context) {
+            function ($property) use ($classMeta) {
                 $annotation = $this->annotationReader->getPropertyAnnotation($property, '\Represent\Annotations\Show');
                 if ($annotation) {
-                    $context->properties[] = $property;
+                    $classMeta->properties[] = $property;
                 }
             }
         );
 
-        return $context;
+        return $classMeta;
     }
 
     /**
      * Decides what properties should be represented using the white list policy
      *
      * @param \ReflectionClass $reflection
-     * @param ClassContext     $context
-     * @return ClassContext
+     * @param ClassMetaData     $classMeta
+     * @return ClassMetaData
      */
-    private function generatePropertiesForWhiteList(\ReflectionClass $reflection, ClassContext $context)
+    private function generatePropertiesForWhiteList(\ReflectionClass $reflection, ClassMetaData $classMeta)
     {
         $properties = $reflection->getProperties();
         $reader     = $this->annotationReader;
 
         array_walk(
             $properties,
-            function ($property) use ($context, $reader) {
+            function ($property) use ($classMeta, $reader) {
                 $annotation = $reader->getPropertyAnnotation($property, '\Represent\Annotations\Hide');
                 if (!$annotation) {
-                    $context->properties[] = $property;
+                    $classMeta->properties[] = $property;
                 }
             }
         );
 
-        return $context;
+        return $classMeta;
     }
 
     /**
-     * Takes a ClassContext and checks that each property belongs to the given group.
+     * Takes a ClassMetaData and checks that each property belongs to the given group.
      *
-     * @param ClassContext $context
-     * @return ClassContext
+     * @param ClassMetaData $classMeta
+     * @return ClassMetaData
      */
-    private function handleGroup(ClassContext $context)
+    private function handleGroup(ClassMetaData $classMeta)
     {
-        $properties = $context->properties;
+        $properties = $classMeta->properties;
         $reader     = $this->annotationReader;
 
-        $context->properties = array_filter(
+        $classMeta->properties = array_filter(
             $properties,
-            function ($property) use ($reader, $context) {
+            function ($property) use ($reader, $classMeta) {
                 $annotation  = $reader->getPropertyAnnotation($property,'\Represent\Annotations\Group');
-                $annotation != null && in_array($context->group, $annotation->name);
+                $annotation != null && in_array($classMeta->group, $annotation->name);
             }
         );
 
-        return $context;
+        return $classMeta;
     }
 }

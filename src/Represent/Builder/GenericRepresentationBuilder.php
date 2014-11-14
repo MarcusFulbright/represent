@@ -3,8 +3,8 @@
 namespace Represent\Builder;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use Represent\Builder\ClassContextBuilder;
-use Represent\Context\ClassContext;
+use Represent\Builder\ClassMetaDataBuilder;
+use Represent\MetaData\ClassMetaData;
 
 /**
  * Builds a generic representation of an object that is format agnostic.
@@ -19,11 +19,11 @@ class GenericRepresentationBuilder
     private $propertyBuilder;
 
     /**
-     * @var ClassContextBuilder
+     * @var ClassMetaDataBuilder
      */
     private $classBuilder;
 
-    public function __construct(PropertyMetaDataBuilder $propertyBuilder, ClassContextBuilder $classBuilder)
+    public function __construct(PropertyMetaDataBuilder $propertyBuilder, ClassMetaDataBuilder $classBuilder)
     {
         $this->propertyBuilder = $propertyBuilder;
         $this->classBuilder = $classBuilder;
@@ -77,11 +77,11 @@ class GenericRepresentationBuilder
     private function handleObject($object, $group)
     {
         $reflection = new \ReflectionClass($object);
-        $context    = $this->classBuilder->buildClassContext($reflection, $group);
+        $classMeta    = $this->classBuilder->buildClassMetaData($reflection, $group);
         $output     = new \stdClass();
 
-        foreach ($context->properties as $property) {
-            $output = $this->handleProperty($property, $object, $output, $context);
+        foreach ($classMeta->properties as $property) {
+            $output = $this->handleProperty($property, $object, $output, $classMeta);
         }
 
         return $output;
@@ -93,12 +93,12 @@ class GenericRepresentationBuilder
      * @param \ReflectionProperty $property
      * @param $original
      * @param $output
-     * @param ClassContext $context
+     * @param ClassMetaData $classMeta
      * @return mixed
      */
-    private function handleProperty(\ReflectionProperty $property, $original, $output, ClassContext $context)
+    private function handleProperty(\ReflectionProperty $property, $original, $output, ClassMetaData $classMeta)
     {
-        $metaData = $this->propertyBuilder->propertyMetaFromReflection($property, $original, $context);
+        $metaData = $this->propertyBuilder->propertyMetaFromReflection($property, $original, $classMeta);
         $value    = $metaData->value;
         $name     = $metaData->name;
 
@@ -106,10 +106,10 @@ class GenericRepresentationBuilder
             case $this->checkArrayCollection($value):
                 $value = $value->toArray();
             case is_array($value);
-                $output->$name = $this->handleArray($value, $context->group);
+                $output->$name = $this->handleArray($value, $classMeta->group);
                 break;
             case is_object($value);
-                $output->$name = $this->handleObject($value, $context->group);
+                $output->$name = $this->handleObject($value, $classMeta->group);
                 break;
             default:
                 $output->$name = $value;

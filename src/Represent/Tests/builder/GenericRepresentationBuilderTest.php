@@ -3,12 +3,12 @@
 namespace Represent\Tests\Builder;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use Represent\Builder\ClassContextBuilder;
 use Represent\Builder\GenericRepresentationBuilder;
 use Represent\Builder\PropertyMetaDataBuilder;
 use Represent\Tests\Fixtures\Adult;
 use Represent\Tests\Fixtures\Child;
 use Represent\Tests\Fixtures\Toy;
+use Represent\Builder\ClassMetaDataBuilder;
 
 class GenericRepresentationBuilderTest extends \PHPUnit_Framework_TestCase
 {
@@ -262,6 +262,6 @@ class GenericRepresentationBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $reader = new AnnotationReader();
 
-        return new GenericRepresentationBuilder(new PropertyMetaDataBuilder($reader), new ClassContextBuilder($reader));
+        return new GenericRepresentationBuilder(new PropertyMetaDataBuilder($reader), new ClassMetaDataBuilder($reader));
     }
 }
