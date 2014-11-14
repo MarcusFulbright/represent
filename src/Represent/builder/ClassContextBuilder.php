@@ -27,14 +27,20 @@ class ClassContextBuilder
     /**
      * Entry point to build the class context object. Currently only knows how to handle exclusion policy.
      * Any new top level class annotations need a handler in here.
-     *
+
      * @param \ReflectionClass $reflection
+     * @param                  $group
      * @return array|ClassContext
      */
-    public function buildClassContext(\ReflectionClass $reflection)
+    public function buildClassContext(\ReflectionClass $reflection, $group)
     {
         $context = new ClassContext();
         $context = $this->handleExclusionPolicy($reflection, $context);
+
+        if ($group) {
+            $context->group = $group;
+            $context = $this->handleGroup($context);
+        }
 
         return $context;
     }
@@ -104,7 +110,7 @@ class ClassContextBuilder
             $properties,
             function ($property) use ($context, $reader) {
                 $annotations = $reader->getPropertyAnnotations($property);
-                $filtered = array_filter(
+                $filtered    = array_filter(
                     $annotations,
                     function ($annot) {
                         return $annot instanceof \Represent\Annotations\Hide;
@@ -113,6 +119,28 @@ class ClassContextBuilder
                 if (!is_null($filtered)) {
                     $context->properties[] = $property;
                 }
+            }
+        );
+
+        return $context;
+    }
+
+    /**
+     * Takes a ClassContext and checks that each property belongs to the given group.
+     *
+     * @param ClassContext $context
+     * @return ClassContext
+     */
+    private function handleGroup(ClassContext $context)
+    {
+        $properties = $context->properties;
+        $reader     = $this->annotationReader;
+
+        $context->properties = array_filter(
+            $properties,
+            function ($property) use ($reader, $context) {
+                $annotation  = $reader->getPropertyAnnotation($property,'\Represent\Annotations\Group');
+                $annotation != null && in_array($context->group, $annotation->name);
             }
         );
 

@@ -7,4 +7,6 @@ class ClassContext
     public $policy;
 
     public $properties = array();
+
+    public $group;
 }
