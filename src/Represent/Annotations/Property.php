@@ -31,7 +31,7 @@ class Property
         }
 
         if (array_key_exists('type', $options) && !in_array($options['type'], PropertyTypeEnum::ToArray())) {
-            throw new \Exception(
+            throw new \InvalidArgumentException(
                 sprintf(
                     'type must be one of the following values: %s',
                     implode(
