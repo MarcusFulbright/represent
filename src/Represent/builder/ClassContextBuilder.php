@@ -79,15 +79,10 @@ class ClassContextBuilder
         array_walk(
             $reflection->getProperties(),
             function ($property) use ($context) {
-                $annotations = $this->annotationReader->getPropertyAnnotations($property);
-                array_walk(
-                    $annotations,
-                    function ($annot) use ($property) {
-                        if ($annot instanceof \Represent\Annotations\Show) {
-                            $context[] = $property;
-                        }
-                    }
-                );
+                $annotation = $this->annotationReader->getPropertyAnnotation($property, '\Represent\Annotations\Show');
+                if ($annotation) {
+                    $context->properties[] = $property;
+                }
             }
         );
 
@@ -109,14 +104,8 @@ class ClassContextBuilder
         array_walk(
             $properties,
             function ($property) use ($context, $reader) {
-                $annotations = $reader->getPropertyAnnotations($property);
-                $filtered    = array_filter(
-                    $annotations,
-                    function ($annot) {
-                        return $annot instanceof \Represent\Annotations\Hide;
-                    }
-                );
-                if (!is_null($filtered)) {
+                $annotation = $reader->getPropertyAnnotation($property, '\Represent\Annotations\Hide');
+                if (!$annotation) {
                     $context->properties[] = $property;
                 }
             }
