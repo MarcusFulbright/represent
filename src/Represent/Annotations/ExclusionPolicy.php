@@ -20,8 +20,8 @@ class ExclusionPolicy
             }
         }
 
-        if (array_key_exists('policy', $options) && !in_array($options['type'], ExclusionPolicyEnum::toArray())) {
-            throw new \Exception(
+        if (array_key_exists('policy', $options) && !in_array($options['policy'], ExclusionPolicyEnum::toArray())) {
+            throw new \InvalidArgumentException(
                 sprintf(
                     'type must be one of the following values: %s',
                     implode(
