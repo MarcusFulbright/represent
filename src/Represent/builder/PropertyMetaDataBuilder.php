@@ -33,11 +33,12 @@ class PropertyMetaDataBuilder
     {
         $property->setAccessible(true);
         $meta = new PropertyMetaData($property->name, $property->getValue($original), $property->class);
+
         return $this->parseAnnotations($meta, $property, $original);
     }
 
     /**
-     * Parses properties for annotations and delegates the handling of those annotaitons
+     * Parses properties for annotations and delegates the handling of those annotations
      *
      * @param PropertyMetaData $meta
      * @param \ReflectionProperty $property

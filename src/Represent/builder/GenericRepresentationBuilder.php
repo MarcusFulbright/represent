@@ -3,6 +3,8 @@
 namespace Represent\Builder;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Represent\Builder\ClassContextBuilder;
+use Represent\Context\ClassContext;
 
 /**
  * Builds a generic representation of an object that is format agnostic.
@@ -16,9 +18,15 @@ class GenericRepresentationBuilder
      */
     private $propertyBuilder;
 
-    public function __construct(PropertyMetaDataBuilder $propertyBuilder)
+    /**
+     * @var ClassContextBuilder
+     */
+    private $classBuilder;
+
+    public function __construct(PropertyMetaDataBuilder $propertyBuilder, ClassContextBuilder $classBuilder)
     {
         $this->propertyBuilder = $propertyBuilder;
+        $this->classBuilder = $classBuilder;
     }
 
     /**
@@ -61,17 +69,17 @@ class GenericRepresentationBuilder
 
     /**
      * Used to handle representing objects
-     *
-     * @param $object
+     * @param           $object
      * @return \stdClass
      */
     private function handleObject($object)
     {
         $reflection = new \ReflectionClass($object);
-        $output = new \stdClass();
+        $context    = $this->classBuilder->buildClassContext($reflection);
+        $output     = new \stdClass();
 
-        foreach ($reflection->getProperties() as $property) {
-            $output = $this->handleProperty($property, $object, $output);
+        foreach ($context->properties as $property) {
+            $output = $this->handleProperty($property, $object, $output, $context);
         }
 
         return $output;
@@ -83,11 +91,12 @@ class GenericRepresentationBuilder
      * @param \ReflectionProperty $property
      * @param $original
      * @param $output
+     * @param ClassContext $context
      * @return mixed
      */
-    private function handleProperty(\ReflectionProperty $property, $original, $output)
+    private function handleProperty(\ReflectionProperty $property, $original, $output, ClassContext $context)
     {
-        $metaData = $this->propertyBuilder->propertyMetaFromReflection($property, $original);
+        $metaData = $this->propertyBuilder->propertyMetaFromReflection($property, $original, $context);
         $value    = $metaData->value;
         $name     = $metaData->name;
 

@@ -3,6 +3,7 @@
 namespace Represent\Tests\Builder;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Represent\Builder\ClassContextBuilder;
 use Represent\Builder\GenericRepresentationBuilder;
 use Represent\Builder\PropertyMetaDataBuilder;
 use Represent\Tests\Fixtures\Adult;
@@ -118,18 +119,17 @@ class GenericRepresentationBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testBuildRepresentationWithObjectAsProperty()
     {
-        $object = new Toy('red', 'car', 'vhroom');
-
+        $object  = new Toy('red', 'car', 'vhroom');
         $parent  = new Adult('first', 'last', 20, $object);
         $builder = $this->getGenericRepresentationBuilder();
         $result  = $builder->buildRepresentation($parent);
 
-        $objectResult = new \stdClass();
+        $objectResult        = new \stdClass();
         $objectResult->color = 'red';
-        $objectResult->name = 'car';
+        $objectResult->name  = 'car';
         $objectResult->sound = 'vhroom';
 
-        $expected = new \stdClass();
+        $expected             = new \stdClass();
         $expected->firstName  = 'first';
         $expected->lastName   = 'last';
         $expected->publicTest = $objectResult;
@@ -260,6 +260,8 @@ class GenericRepresentationBuilderTest extends \PHPUnit_Framework_TestCase
 
     private function getGenericRepresentationBuilder()
     {
-        return new GenericRepresentationBuilder(new PropertyMetaDataBuilder(new AnnotationReader()));
+        $reader = new AnnotationReader();
+
+        return new GenericRepresentationBuilder(new PropertyMetaDataBuilder($reader), new ClassContextBuilder($reader));
     }
 }
