@@ -11,7 +11,6 @@ use Represent\MetaData\PropertyMetaData;
  * Responsible for building representations of class properties
  *
  * Class PropertyMetaDataBuilder
- * @package Represent\Builder
  */
 class PropertyMetaDataBuilder
 {

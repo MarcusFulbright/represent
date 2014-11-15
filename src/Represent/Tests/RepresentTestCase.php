@@ -43,6 +43,12 @@ class RepresentTestCase extends \PHPUnit_Framework_TestCase
     {
         return \Mockery::mock('Represent\Annotations\Group');
     }
+
+    protected function getPropertyMock()
+    {
+        return \Mockery::mock('Represent\Annotations\Property');
+    }
+
     /**
      * Creates a reflection method and makes it accessible
      *
