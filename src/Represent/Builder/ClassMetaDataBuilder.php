@@ -32,7 +32,7 @@ class ClassMetaDataBuilder
      * @param                  $group
      * @return array|ClassMetaData
      */
-    public function buildClassMetaData(\ReflectionClass $reflection, $group)
+    public function buildClassMetaData(\ReflectionClass $reflection, $group = null)
     {
         $classMeta = new ClassMetaData();
         $classMeta = $this->handleExclusionPolicy($reflection, $classMeta);
@@ -76,10 +76,13 @@ class ClassMetaDataBuilder
      */
     private function generatePropertiesForBlackList(\ReflectionClass $reflection, ClassMetaData $classMeta)
     {
+        $properties = $reflection->getProperties();
+        $reader     = $this->annotationReader;
+
         array_walk(
-            $reflection->getProperties(),
-            function ($property) use ($classMeta) {
-                $annotation = $this->annotationReader->getPropertyAnnotation($property, '\Represent\Annotations\Show');
+            $properties,
+            function ($property) use ($classMeta, $reader) {
+                $annotation = $reader->getPropertyAnnotation($property, '\Represent\Annotations\Show');
                 if ($annotation) {
                     $classMeta->properties[] = $property;
                 }
@@ -128,8 +131,9 @@ class ClassMetaDataBuilder
         $classMeta->properties = array_filter(
             $properties,
             function ($property) use ($reader, $classMeta) {
-                $annotation  = $reader->getPropertyAnnotation($property,'\Represent\Annotations\Group');
-                $annotation != null && in_array($classMeta->group, $annotation->name);
+                $annotation = $reader->getPropertyAnnotation($property,'\Represent\Annotations\Group');
+
+                return $annotation != null && in_array($classMeta->group, $annotation->name);
             }
         );
 
