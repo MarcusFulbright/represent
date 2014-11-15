@@ -13,7 +13,7 @@
 
     <testsuites>
         <testsuite name="represent test suite">
-            <directory>src/represent/tests</directory>
+            <directory>src/Represent/Tests</directory>
         </testsuite>
     </testsuites>
 </phpunit>
