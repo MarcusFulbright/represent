@@ -49,6 +49,11 @@ class RepresentTestCase extends \PHPUnit_Framework_TestCase
         return \Mockery::mock('Represent\Annotations\Property');
     }
 
+    protected function getPropertyMetaDataMock()
+    {
+        return \Mockery::mock('Represent\MetaData\PropertyMetaData');
+    }
+
     /**
      * Creates a reflection method and makes it accessible
      *
