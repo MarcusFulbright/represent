@@ -11,5 +11,5 @@ class ClassMetaData
 
     public $properties = array();
 
-    public $group;
+    public $group = null;
 }

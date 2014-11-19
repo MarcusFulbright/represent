@@ -54,6 +54,26 @@ class RepresentTestCase extends \PHPUnit_Framework_TestCase
         return \Mockery::mock('Represent\MetaData\PropertyMetaData');
     }
 
+    protected function getLinkCollectionMock()
+    {
+        return \Mockery::mock('Represent\Annotations\LinkCollection');
+    }
+
+    protected function getLinkMock()
+    {
+        return \Mockery::mock('Represent\Annotations\Link');
+    }
+
+    protected function getLinkGeneratorMock()
+    {
+        return \Mockery::mock('Represent\Generator\LinkGenerator');
+    }
+
+    protected function getEmbeddedMock()
+    {
+        return \Mockery::mock('Represent\Annotations\Embedded');
+    }
+
     /**
      * Creates a reflection method and makes it accessible
      *
