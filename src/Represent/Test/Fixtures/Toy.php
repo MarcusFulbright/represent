@@ -1,6 +1,6 @@
 <?php
 
-namespace Represent\Tests\Fixtures;
+namespace Represent\Test\Fixtures;
 
 class Toy
 {

@@ -6,9 +6,9 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Represent\Builder\GenericRepresentationBuilder;
 use Represent\Builder\PropertyContextBuilder;
 use Represent\Test\RepresentTestCase;
-use Represent\Tests\Fixtures\Adult;
-use Represent\Tests\Fixtures\Child;
-use Represent\Tests\Fixtures\Toy;
+use Represent\Test\Fixtures\Adult;
+use Represent\Test\Fixtures\Child;
+use Represent\Test\Fixtures\Toy;
 use Represent\Builder\ClassContextBuilder;
 
 class GenericRepresentationBuilderTest extends RepresentTestCase
