@@ -37,10 +37,8 @@ class ClassContextBuilder
         $classContext = new ClassContext();
         $classContext = $this->handleExclusionPolicy($reflection, $classContext);
 
-        if ($group) {
-            $classContext->group = $group;
-            $classContext = $this->handleGroup($classContext);
-        }
+        $classContext->group = $group;
+        $classContext = $this->handleGroup($classContext);
 
         return $classContext;
     }
@@ -129,7 +127,7 @@ class ClassContextBuilder
             function ($property) use ($reader, $classContext) {
                 $annotation = $reader->getPropertyAnnotation($property,'\Represent\Annotations\Group');
 
-                return $annotation != null && in_array($classContext->group, $annotation->name);
+                return $annotation == null || in_array($classContext->group, $annotation->name);
             }
         );
 

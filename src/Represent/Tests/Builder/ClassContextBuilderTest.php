@@ -42,6 +42,7 @@ class ClassContextBuilderTest extends RepresentTestCase
         $reader->shouldReceive('getClassAnnotation')->with($class, '\Represent\Annotations\ExclusionPolicy')->andReturnNull();
         $class->shouldReceive('getProperties')->andReturn(array($property));
         $reader->shouldReceive('getPropertyAnnotation')->with($property, '\Represent\Annotations\Hide')->andReturnNull();
+        $reader->shouldReceive('getPropertyAnnotation')->with($property, '\Represent\Annotations\Group')->andReturnNull();
 
         $builder = new ClassContextBuilder($reader);
         $result  = $builder->buildClassContext($class);
