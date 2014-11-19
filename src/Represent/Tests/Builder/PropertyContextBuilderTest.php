@@ -17,7 +17,7 @@ class PropertyContextBuilderTest extends RepresentTestCase
 
         $property->shouldReceive('getValue')->with($original)->andReturn($value);
         $property->shouldReceive('setAccessible')->once()->with(true);
-        $reader->shouldReceive('getPropertyAnnotations')->with($property)->andReturn(array());
+        $reader->shouldReceive('getPropertyAnnotation')->with($property, '\Represent\Annotations\Property')->andReturnNull();
 
         $builder = new PropertyContextBuilder($reader);
         $result  = $builder->propertyContextFromReflection($property, $original);
@@ -35,7 +35,7 @@ class PropertyContextBuilderTest extends RepresentTestCase
         $annot    = $this->getPropertyMock();
         $name     = 'test-name';
 
-        $reader->shouldReceive('getPropertyAnnotations')->with($property)->andReturn(array($annot));
+        $reader->shouldReceive('getPropertyAnnotation')->with($property, '\Represent\Annotations\Property')->andReturn($annot);
         $annot->shouldReceive('getName')->andReturn($name);
         $annot->shouldReceive('getType')->andReturnNull();
 
