@@ -1,13 +1,13 @@
 <?php
 
-namespace Represent\Builder;
+namespace Represent\Builder\Format;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Represent\Annotations\LinkCollection;
 use Represent\Generator\LinkGenerator;
 use Represent\MetaData\ClassMetaData;
 
-class HalBuilder
+class HalFormatBuilder implements  FormatBuilderInterface
 {
     /**
      * @var \Doctrine\Common\Annotations\AnnotationReader
@@ -37,7 +37,7 @@ class HalBuilder
      * @param ClassMetaData $meta
      * @return mixed
      */
-    public function buildHalRepresentation($representation, $object, ClassMetaData $meta)
+    public function buildRepresentation($representation, $object, ClassMetaData $meta)
     {
         $representation->_embedded = $this->getEmbedded($representation, $object, new \ReflectionClass($object));
         $representation->_links    = $this->getLinks(new \ReflectionClass($object), $meta);

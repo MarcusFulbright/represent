@@ -2,7 +2,7 @@
 
 namespace Represent\Tests\Builder;
 
-use Represent\Builder\HalBuilder;
+use Represent\Builder\Format\HalFormatBuilder;
 use Represent\Tests\RepresentTestCase;
 
 class HalBuilderTest extends RepresentTestCase
@@ -23,7 +23,7 @@ class HalBuilderTest extends RepresentTestCase
         $property->shouldReceive('getName')->andReturn($name);
         $property->shouldReceive('getValue')->with($object)->andReturn($value);
 
-        $builder = new HalBuilder($reader, $this->getLinkGeneratorMock());
+        $builder = new HalFormatBuilder($reader, $this->getLinkGeneratorMock());
         $result  = $this->getReflectedMethod($builder, 'getEmbedded')->invoke($builder, $representation, $object, $reflection);
 
         $this->assertEquals($value, $result->$name);
@@ -40,7 +40,7 @@ class HalBuilderTest extends RepresentTestCase
         $reflection->shouldReceive('getProperties')->andReturn(array($property));
         $reader->shouldReceive('getPropertyAnnotation')->with($property, '\Represent\Annotations\HalEmbedded')->andReturnNull();
 
-        $builder = new HalBuilder($reader, $this->getLinkGeneratorMock());
+        $builder = new HalFormatBuilder($reader, $this->getLinkGeneratorMock());
         $result  = $this->getReflectedMethod($builder, 'getEmbedded')->invoke($builder, $representation, $object, $reflection);
 
         $this->assertEquals(new \stdClass(), $result);
@@ -65,7 +65,7 @@ class HalBuilderTest extends RepresentTestCase
         $generator->shouldReceive('generate')->with($link)->andReturn($uri);
         $reader->shouldReceive('getClassAnnotation')->with($reflection, '\Represent\Annotations\LinkCollection')->andReturn($annot);
 
-        $builder = new HalBuilder($reader, $generator);
+        $builder = new HalFormatBuilder($reader, $generator);
         $result  = $this->getReflectedMethod($builder, 'getLinks')->invoke($builder, $reflection, $meta);
 
         $this->assertEquals($uri, $result->$name);
@@ -79,7 +79,7 @@ class HalBuilderTest extends RepresentTestCase
 
         $reader->shouldReceive('getClassAnnotation')->with($reflection, '\Represent\Annotations\LinkCollection')->andReturnNull();
 
-        $builder = new HalBuilder($reader, $this->getLinkGeneratorMock());
+        $builder = new HalFormatBuilder($reader, $this->getLinkGeneratorMock());
         $result  = $this->getReflectedMethod($builder, 'getLinks')->invoke($builder, $reflection, $meta);
 
         $this->assertEquals(new \stdClass(), $result);
@@ -103,7 +103,7 @@ class HalBuilderTest extends RepresentTestCase
         $generator->shouldReceive('generate')->with($link)->andReturn($uri);
 
 
-        $builder = new HalBuilder($this->getAnnotationReaderMock(), $generator);
+        $builder = new HalFormatBuilder($this->getAnnotationReaderMock(), $generator);
         $result  = $this->getReflectedMethod($builder, 'parseLinks')->invoke($builder, $annot, $meta, $output);
 
         $this->assertEquals($result->$name, $uri);
@@ -127,7 +127,7 @@ class HalBuilderTest extends RepresentTestCase
         $generator->shouldReceive('generate')->with($link)->andReturn($uri);
 
 
-        $builder = new HalBuilder($this->getAnnotationReaderMock(), $generator);
+        $builder = new HalFormatBuilder($this->getAnnotationReaderMock(), $generator);
         $result  = $this->getReflectedMethod($builder, 'parseLinks')->invoke($builder, $annot, $meta, $output);
 
         $this->assertEquals($result, $output);
