@@ -1,12 +1,11 @@
 <?php
 
-namespace Represent\MetaData;
+namespace Represent\Context;
 
 /**
  * Value object that can be used to supplement \ReflectionProperty. This allows for more manipulation
- *
  */
-class PropertyMetaData 
+class PropertyContext
 {
     public $name;
 

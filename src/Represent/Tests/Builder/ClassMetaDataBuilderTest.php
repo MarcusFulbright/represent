@@ -2,51 +2,51 @@
 
 namespace Represent\Tests\Builder;
 
-use Represent\Builder\ClassMetaDataBuilder;
+use Represent\Builder\ClassContextBuilder;
 use Represent\Enum\ExclusionPolicyEnum;
-use Represent\Tests\RepresentTestCase;
+use Represent\Test\RepresentTestCase;
 
-class ClassMetaDataBuilderTest extends RepresentTestCase
+class ClassContextBuilderTest extends RepresentTestCase
 {
-    public function testBuildClassMetaDataWithGroup()
+    public function testBuildClassContextWithGroup()
     {
         $class     = $this->getBasicReflectionClassMock();
         $reader    = $this->getAnnotationReaderMock();
         $property  = $this->getBasicReflectionPropertyMock();
         $group     = $this->getGroupMock();
         $groupName = 'test';
-        $meta      = $this->getClassMetaDataMock();
+        $context   = $this->getClassContextMock();
 
-        $meta->properties = array();
-        $group->name      = array($groupName);
+        $context->properties = array();
+        $group->name         = array($groupName);
         $reader->shouldReceive('getClassAnnotation')->with($class, '\Represent\Annotations\ExclusionPolicy')->andReturnNull();
         $class->shouldReceive('getProperties')->andReturn(array($property));
         $reader->shouldReceive('getPropertyAnnotation')->with($property, '\Represent\Annotations\Hide')->andReturnNull();
         $reader->shouldReceive('getPropertyAnnotation')->with($property, '\Represent\Annotations\Group')->andReturn($group);
 
-        $builder = new ClassMetaDataBuilder($reader);
-        $result  = $builder->buildClassMetaData($class, $groupName);
+        $builder = new ClassContextBuilder($reader);
+        $result  = $builder->buildClassContext($class, $groupName);
 
         $this->assertEquals(array($property), $result->properties);
     }
 
 
-    public function testBuildClassMetaData()
+    public function testBuildClassContext()
     {
         $class    = $this->getBasicReflectionClassMock();
-        $meta     = $this->getClassMetaDataMock();
+        $context  = $this->getClassContextMock();
         $reader   = $this->getAnnotationReaderMock();
         $property = $this->getBasicReflectionPropertyMock();
 
-        $meta->properties = array();
+        $context->properties = array();
         $reader->shouldReceive('getClassAnnotation')->with($class, '\Represent\Annotations\ExclusionPolicy')->andReturnNull();
         $class->shouldReceive('getProperties')->andReturn(array($property));
         $reader->shouldReceive('getPropertyAnnotation')->with($property, '\Represent\Annotations\Hide')->andReturnNull();
 
-        $builder = new ClassMetaDataBuilder($reader);
-        $result  = $builder->buildClassMetaData($class);
+        $builder = new ClassContextBuilder($reader);
+        $result  = $builder->buildClassContext($class);
 
-        $this->assertInstanceOf('Represent\MetaData\ClassMetaData', $result);
+        $this->assertInstanceOf('Represent\Context\ClassContext', $result);
         $this->assertEquals(array($property), $result->properties);
         $this->assertEquals(ExclusionPolicyEnum::WHITELIST, $result->policy);
     }
@@ -55,21 +55,21 @@ class ClassMetaDataBuilderTest extends RepresentTestCase
     public function testHandleExclusionPolicyBlackList()
     {
         $class    = $this->getBasicReflectionClassMock();
-        $meta     = $this->getClassMetaDataMock();
+        $context  = $this->getClassContextMock();
         $reader   = $this->getAnnotationReaderMock();
         $policy   = $this->getExclusionPolicyMock();
         $property = $this->getBasicReflectionPropertyMock();
 
-        $meta->properties = array();
+        $context->properties = array();
         $policy->shouldReceive('getPolicy')->andReturn(ExclusionPolicyEnum::BLACKLIST);
         $reader->shouldReceive('getClassAnnotation')->with($class, '\Represent\Annotations\ExclusionPolicy')->andReturn($policy);
         $class->shouldReceive('getProperties')->andReturn(array($property));
         $reader->shouldReceive('getPropertyAnnotation')->with($property, '\Represent\Annotations\Show')->andReturn($this->getShowMock());
 
-        $builder = new ClassMetaDataBuilder($reader);
-        $result  = $this->getReflectedMethod($builder, 'handleExclusionPolicy')->invoke($builder, $class, $meta);
+        $builder = new ClassContextBuilder($reader);
+        $result  = $this->getReflectedMethod($builder, 'handleExclusionPolicy')->invoke($builder, $class, $context);
 
-        $this->assertInstanceOf('Represent\MetaData\ClassMetaData', $result);
+        $this->assertInstanceOf('Represent\Context\ClassContext', $result);
         $this->assertEquals(array($property), $result->properties);
         $this->assertEquals(ExclusionPolicyEnum::BLACKLIST, $result->policy);
     }
@@ -78,19 +78,19 @@ class ClassMetaDataBuilderTest extends RepresentTestCase
     public function testHandleExclusionPolicyNull()
     {
         $class    = $this->getBasicReflectionClassMock();
-        $meta     = $this->getClassMetaDataMock();
+        $context  = $this->getClassContextMock();
         $reader   = $this->getAnnotationReaderMock();
         $property = $this->getBasicReflectionPropertyMock();
 
-        $meta->properties = array();
+        $context->properties = array();
         $reader->shouldReceive('getClassAnnotation')->with($class, '\Represent\Annotations\ExclusionPolicy')->andReturnNull();
         $class->shouldReceive('getProperties')->andReturn(array($property));
         $reader->shouldReceive('getPropertyAnnotation')->with($property, '\Represent\Annotations\Hide')->andReturnNull();
 
-        $builder = new ClassMetaDataBuilder($reader);
-        $result  = $this->getReflectedMethod($builder, 'handleExclusionPolicy')->invoke($builder, $class, $meta);
+        $builder = new ClassContextBuilder($reader);
+        $result  = $this->getReflectedMethod($builder, 'handleExclusionPolicy')->invoke($builder, $class, $context);
 
-        $this->assertInstanceOf('Represent\MetaData\ClassMetaData', $result);
+        $this->assertInstanceOf('Represent\Context\ClassContext', $result);
         $this->assertEquals(array($property), $result->properties);
         $this->assertEquals(ExclusionPolicyEnum::WHITELIST, $result->policy);
     }
@@ -98,21 +98,21 @@ class ClassMetaDataBuilderTest extends RepresentTestCase
     public function testHandleExclusionPolicyWhiteList()
     {
         $class    = $this->getBasicReflectionClassMock();
-        $meta     = $this->getClassMetaDataMock();
+        $context  = $this->getClassContextMock();
         $reader   = $this->getAnnotationReaderMock();
         $policy   = $this->getExclusionPolicyMock();
         $property = $this->getBasicReflectionPropertyMock();
 
-        $meta->properties = array();
+        $context->properties = array();
         $policy->shouldReceive('getPolicy')->andReturn(ExclusionPolicyEnum::WHITELIST);
         $reader->shouldReceive('getClassAnnotation')->with($class, '\Represent\Annotations\ExclusionPolicy')->andReturn($policy);
         $class->shouldReceive('getProperties')->andReturn(array($property));
         $reader->shouldReceive('getPropertyAnnotation')->with($property, '\Represent\Annotations\Hide')->andReturn(null);
 
-        $builder = new ClassMetaDataBuilder($reader);
-        $result  = $this->getReflectedMethod($builder, 'handleExclusionPolicy')->invoke($builder, $class, $meta);
+        $builder = new ClassContextBuilder($reader);
+        $result  = $this->getReflectedMethod($builder, 'handleExclusionPolicy')->invoke($builder, $class, $context);
 
-        $this->assertInstanceOf('Represent\MetaData\ClassMetaData', $result);
+        $this->assertInstanceOf('Represent\Context\ClassContext', $result);
         $this->assertEquals(array($property), $result->properties);
         $this->assertEquals(ExclusionPolicyEnum::WHITELIST, $result->policy);
     }
@@ -120,33 +120,33 @@ class ClassMetaDataBuilderTest extends RepresentTestCase
     public function testGeneratePropertiesForBlackListNoShow()
     {
         $class    = $this->getBasicReflectionClassMock();
-        $meta     = $this->getClassMetaDataMock();
+        $context  = $this->getClassContextMock();
         $property = $this->getBasicReflectionPropertyMock();
         $reader   = $this->getAnnotationReaderMock();
 
         $class->shouldReceive('getProperties')->andReturn(array($property));
         $reader->shouldReceive('getPropertyAnnotation')->with($property, '\Represent\Annotations\Show')->andReturn(null);
-        $meta->properties = array();
+        $context->properties = array();
 
-        $builder = new ClassMetaDataBuilder($reader);
-        $result  = $this->getReflectedMethod($builder, 'generatePropertiesForBlackList')->invoke($builder, $class, $meta);
+        $builder = new ClassContextBuilder($reader);
+        $result  = $this->getReflectedMethod($builder, 'generatePropertiesForBlackList')->invoke($builder, $class, $context);
 
-        $this->asserttrue(empty($result->properties));
+        $this->assertTrue(empty($result->properties));
     }
 
     public function testGeneratePropertiesForBlackListWithShow()
    {
        $class    = $this->getBasicReflectionClassMock();
-       $meta     = $this->getClassMetaDataMock();
+       $context  = $this->getClassContextMock();
        $property = $this->getBasicReflectionPropertyMock();
        $reader   = $this->getAnnotationReaderMock();
 
        $class->shouldReceive('getProperties')->andReturn(array($property));
        $reader->shouldReceive('getPropertyAnnotation')->with($property, '\Represent\Annotations\Show')->andReturn($this->getShowMock());
-       $meta->properties = array();
+       $context->properties = array();
 
-       $builder = new ClassMetaDataBuilder($reader);
-       $result  = $this->getReflectedMethod($builder, 'generatePropertiesForBlackList')->invoke($builder, $class, $meta);
+       $builder = new ClassContextBuilder($reader);
+       $result  = $this->getReflectedMethod($builder, 'generatePropertiesForBlackList')->invoke($builder, $class, $context);
 
        $this->assertEquals(array($property), $result->properties);
    }
@@ -155,15 +155,15 @@ class ClassMetaDataBuilderTest extends RepresentTestCase
     {
         $property = $this->getBasicReflectionPropertyMock();
         $class    = $this->getBasicReflectionClassMock();
-        $meta     = $this->getClassMetaDataMock();
+        $context  = $this->getClassContextMock();
         $reader   = $this->getAnnotationReaderMock();
 
         $class->shouldReceive('getProperties')->andReturn(array($property));
-        $meta->properties = array();
+        $context->properties = array();
         $reader->shouldReceive('getPropertyAnnotation')->with($property, '\Represent\Annotations\Hide')->andReturn(null);
 
-        $builder = new ClassMetaDataBuilder($reader);
-        $result  = $this->getReflectedMethod(new ClassMetaDataBuilder($reader), 'generatePropertiesForWhiteList')->invoke($builder, $class, $meta);
+        $builder = new ClassContextBuilder($reader);
+        $result  = $this->getReflectedMethod(new ClassContextBuilder($reader), 'generatePropertiesForWhiteList')->invoke($builder, $class, $context);
 
         $this->assertEquals(array($property), $result->properties);
     }
@@ -173,52 +173,52 @@ class ClassMetaDataBuilderTest extends RepresentTestCase
     {
         $property = $this->getBasicReflectionPropertyMock();
         $class    = $this->getBasicReflectionClassMock();
-        $meta     = $this->getClassMetaDataMock();
+        $context  = $this->getClassContextMock();
         $reader   = $this->getAnnotationReaderMock();
 
         $class->shouldReceive('getProperties')->andReturn(array($property));
-        $meta->properties = array();
+        $context->properties = array();
         $reader->shouldReceive('getPropertyAnnotation')->with($property, '\Represent\Annotations\Hide')->andReturn($this->getHideMock());
 
-        $builder = new ClassMetaDataBuilder($reader);
-        $result  = $this->getReflectedMethod(new ClassMetaDataBuilder($reader), 'generatePropertiesForWhiteList')->invoke($builder, $class, $meta);
+        $builder = new ClassContextBuilder($reader);
+        $result  = $this->getReflectedMethod($builder, 'generatePropertiesForWhiteList')->invoke($builder, $class, $context);
 
         $this->assertTrue(empty($result->properties));
     }
 
     public function testHandleGroupTrue()
     {
-        $meta      = $this->getClassMetaDataMock();
+        $context   = $this->getClassContextMock();
         $reader    = $this->getAnnotationReaderMock();
         $property  = $this->getBasicReflectionPropertyMock();
         $group     = $this->getGroupMock();
         $groupName = 'test';
 
-        $meta->properties = array($property);
-        $meta->group      = $groupName;
+        $context->properties = array($property);
+        $context->group      = $groupName;
         $group->name      = array($groupName);
         $reader->shouldReceive('getPropertyAnnotation')->with($property, '\Represent\Annotations\Group')->andReturn($group);
 
-        $builder = new ClassMetaDataBuilder($reader);
-        $result  = $this->getReflectedMethod($builder, 'handleGroup')->invoke($builder, $meta);
+        $builder = new ClassContextBuilder($reader);
+        $result  = $this->getReflectedMethod($builder, 'handleGroup')->invoke($builder, $context);
 
         $this->assertEquals(array($property), $result->properties);
     }
 
     public function testHandleGroupFalse()
     {
-        $meta      = $this->getClassMetaDataMock();
-        $reader    = $this->getAnnotationReaderMock();
-        $property  = $this->getBasicReflectionPropertyMock();
-        $group     = $this->getGroupMock();
+        $context  = $this->getClassContextMock();
+        $reader   = $this->getAnnotationReaderMock();
+        $property = $this->getBasicReflectionPropertyMock();
+        $group    = $this->getGroupMock();
 
-        $meta->properties = array($property);
-        $meta->group      = 'wrong';
+        $context->properties = array($property);
+        $context->group      = 'wrong';
         $group->name      = array('test');
         $reader->shouldReceive('getPropertyAnnotation')->with($property, '\Represent\Annotations\Group')->andReturn($group);
 
-        $builder = new ClassMetaDataBuilder($reader);
-        $result  = $this->getReflectedMethod($builder, 'handleGroup')->invoke($builder, $meta);
+        $builder = new ClassContextBuilder($reader);
+        $result  = $this->getReflectedMethod($builder, 'handleGroup')->invoke($builder, $context);
 
         $this->assertTrue(empty($result->properties));
     }

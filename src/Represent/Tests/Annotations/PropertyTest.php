@@ -3,8 +3,9 @@
 namespace Represent\Tests\Annotations;
 
 use Represent\Annotations\Property;
+use Represent\Test\RepresentTestCase;
 
-class PropertyTest extends \PHPUnit_Framework_TestCase
+class PropertyTest extends RepresentTestCase
 {
     public function testDoesNotAllowInvalidProperties()
     {

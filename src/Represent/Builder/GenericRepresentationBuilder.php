@@ -3,8 +3,8 @@
 namespace Represent\Builder;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use Represent\Builder\ClassMetaDataBuilder;
-use Represent\MetaData\ClassMetaData;
+use Represent\Builder\ClassContextBuilder;
+use Represent\Context\ClassContext;
 
 /**
  * Builds a generic representation of an object that is format agnostic.
@@ -14,19 +14,19 @@ use Represent\MetaData\ClassMetaData;
 class GenericRepresentationBuilder
 {
     /**
-     * @var \Represent\Builder\PropertyMetaDataBuilder
+     * @var \Represent\Builder\PropertyContextBuilder
      */
     private $propertyBuilder;
 
     /**
-     * @var ClassMetaDataBuilder
+     * @var ClassContextBuilder
      */
     private $classBuilder;
 
-    public function __construct(PropertyMetaDataBuilder $propertyBuilder, ClassMetaDataBuilder $classBuilder)
+    public function __construct(PropertyContextBuilder $propertyBuilder, ClassContextBuilder $classBuilder)
     {
         $this->propertyBuilder = $propertyBuilder;
-        $this->classBuilder = $classBuilder;
+        $this->classBuilder    = $classBuilder;
     }
 
     /**
@@ -76,12 +76,12 @@ class GenericRepresentationBuilder
      */
     private function handleObject($object, $group)
     {
-        $reflection = new \ReflectionClass($object);
-        $classMeta    = $this->classBuilder->buildClassMetaData($reflection, $group);
-        $output     = new \stdClass();
+        $reflection   = new \ReflectionClass($object);
+        $classContext = $this->classBuilder->buildClassContext($reflection, $group);
+        $output       = new \stdClass();
 
-        foreach ($classMeta->properties as $property) {
-            $output = $this->handleProperty($property, $object, $output, $classMeta);
+        foreach ($classContext->properties as $property) {
+            $output = $this->handleProperty($property, $object, $output, $classContext);
         }
 
         return $output;
@@ -89,27 +89,26 @@ class GenericRepresentationBuilder
 
     /**
      * Used to handle determining representing object properties
-     *
-     * @param \ReflectionProperty $property
-     * @param $original
-     * @param $output
-     * @param ClassMetaData $classMeta
-     * @return mixed
+     * @param \ReflectionProperty             $property
+     * @param                                 $original
+     * @param                                 $output
+     * @param \Represent\Context\ClassContext $classContext
+     * @return stdClass
      */
-    private function handleProperty(\ReflectionProperty $property, $original, $output, ClassMetaData $classMeta)
+    private function handleProperty(\ReflectionProperty $property, $original, $output, ClassContext $classContext)
     {
-        $metaData = $this->propertyBuilder->propertyMetaFromReflection($property, $original, $classMeta);
-        $value    = $metaData->value;
-        $name     = $metaData->name;
+        $propertyContext = $this->propertyBuilder->propertyContextFromReflection($property, $original, $classContext);
+        $value    = $propertyContext->value;
+        $name     = $propertyContext->name;
 
         switch (true):
             case $this->checkArrayCollection($value):
                 $value = $value->toArray();
             case is_array($value);
-                $output->$name = $this->handleArray($value, $classMeta->group);
+                $output->$name = $this->handleArray($value, $classContext->group);
                 break;
             case is_object($value);
-                $output->$name = $this->handleObject($value, $classMeta->group);
+                $output->$name = $this->handleObject($value, $classContext->group);
                 break;
             default:
                 $output->$name = $value;

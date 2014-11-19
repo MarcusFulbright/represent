@@ -13,7 +13,8 @@
 
     <testsuites>
         <testsuite name="represent test suite">
-            <directory>src/Represent/Tests</directory>
+            <directory suffix="Test.php">src/Represent/Tests</directory>
+            <exclude>src/Represent/Tests/RepresentTestCase</exclude>
         </testsuite>
     </testsuites>
 </phpunit>

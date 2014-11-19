@@ -3,8 +3,9 @@
 namespace Represent\Tests\Annotations;
 
 use Represent\Annotations\ExclusionPolicy;
+use Represent\Test\RepresentTestCase;
 
-class ExclusionPolicyTest extends \PHPUnit_Framework_TestCase
+class ExclusionPolicyTest extends RepresentTestCase
 {
     public function testOnlyAllowsForPolicy()
     {

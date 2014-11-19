@@ -2,13 +2,13 @@
 
 namespace Represent\Test\Builder;
 
-use Represent\Builder\PropertyMetaDataBuilder;
+use Represent\Builder\PropertyContextBuilder;
 use Represent\Enum\PropertyTypeEnum;
-use Represent\Tests\RepresentTestCase;
+use Represent\Test\RepresentTestCase;
 
-class PropertyMetaDataBuilderTest extends RepresentTestCase
+class PropertyContextBuilderTest extends RepresentTestCase
 {
-    public function testPropertyMetaFromReflection()
+    public function testPropertyContextFromReflection()
     {
         $value    = 'test';
         $property = $this->getBasicReflectionPropertyMock();
@@ -19,8 +19,8 @@ class PropertyMetaDataBuilderTest extends RepresentTestCase
         $property->shouldReceive('setAccessible')->once()->with(true);
         $reader->shouldReceive('getPropertyAnnotations')->with($property)->andReturn(array());
 
-        $builder = new PropertyMetaDataBuilder($reader);
-        $result  = $builder->propertyMetaFromReflection($property, $original);
+        $builder = new PropertyContextBuilder($reader);
+        $result  = $builder->propertyContextFromReflection($property, $original);
 
         $this->assertEquals($value, $result->value);
         $this->assertInternalType('string', $result->value);
@@ -29,7 +29,7 @@ class PropertyMetaDataBuilderTest extends RepresentTestCase
 
     public function testParseAnnotations()
     {
-        $meta     = $this->getPropertyMetaDataMock();
+        $context  = $this->getPropertyContextMock();
         $property = $this->getBasicReflectionPropertyMock();
         $reader   = $this->getAnnotationReaderMock();
         $annot    = $this->getPropertyMock();
@@ -39,8 +39,8 @@ class PropertyMetaDataBuilderTest extends RepresentTestCase
         $annot->shouldReceive('getName')->andReturn($name);
         $annot->shouldReceive('getType')->andReturnNull();
 
-        $builder = new PropertyMetaDataBuilder($reader);
-        $result  = $this->getReflectedMethod($builder, 'parseAnnotations')->invoke($builder, $meta, $property, $meta);
+        $builder = new PropertyContextBuilder($reader);
+        $result  = $this->getReflectedMethod($builder, 'parseAnnotations')->invoke($builder, $context, $property, $context);
 
         $this->assertEquals($name, $result->name);
     }
@@ -52,15 +52,15 @@ class PropertyMetaDataBuilderTest extends RepresentTestCase
         $type     = PropertyTypeEnum::STRING;
         $annot    = $this->getPropertyMock();
         $property = $this->getBasicReflectionPropertyMock();
-        $meta     = $this->getPropertyMetaDataMock();
+        $context  = $this->getPropertyContextMock();
         $original = \Mockery::mock('\stdClass');
 
         $annot->shouldReceive('getName')->andReturn($name);
         $annot->shouldReceive('getType')->andReturn($type);
         $property->shouldReceive('getValue')->with($original)->andReturn($value);
 
-        $builder = new PropertyMetaDataBuilder($this->getAnnotationReaderMock());
-        $result  = $this->getReflectedMethod($builder, 'handleRepresentProperty')->invoke($builder, $property, $annot, $meta, $original);
+        $builder = new PropertyContextBuilder($this->getAnnotationReaderMock());
+        $result  = $this->getReflectedMethod($builder, 'handleRepresentProperty')->invoke($builder, $property, $annot, $context, $original);
 
         $this->assertEquals($name, $result->name);
         $this->assertEquals($value, $result->value);
@@ -71,7 +71,7 @@ class PropertyMetaDataBuilderTest extends RepresentTestCase
         $type  = PropertyTypeEnum::INTEGER;
         $value = '1';
 
-        $builder = new PropertyMetaDataBuilder($this->getAnnotationReaderMock());
+        $builder = new PropertyContextBuilder($this->getAnnotationReaderMock());
         $result  = $this->getReflectedMethod($builder, 'handleTypeConversion')->invoke($builder, $type, $value);
 
         $this->assertInternalType('int', $result);
@@ -83,7 +83,7 @@ class PropertyMetaDataBuilderTest extends RepresentTestCase
         $type  = PropertyTypeEnum::STRING;
         $value = 1;
 
-        $builder = new PropertyMetaDataBuilder($this->getAnnotationReaderMock());
+        $builder = new PropertyContextBuilder($this->getAnnotationReaderMock());
         $result  = $this->getReflectedMethod($builder, 'handleTypeConversion')->invoke($builder, $type, $value);
 
         $this->assertInternalType('string', $result);
@@ -95,7 +95,7 @@ class PropertyMetaDataBuilderTest extends RepresentTestCase
         $type  = PropertyTypeEnum::BOOLEAN;
         $value = 'true';
 
-        $builder = new PropertyMetaDataBuilder($this->getAnnotationReaderMock());
+        $builder = new PropertyContextBuilder($this->getAnnotationReaderMock());
         $result  = $this->getReflectedMethod($builder, 'handleTypeConversion')->invoke($builder, $type, $value);
 
         $this->assertInternalType('boolean', $result);
@@ -107,7 +107,7 @@ class PropertyMetaDataBuilderTest extends RepresentTestCase
         $type  = PropertyTypeEnum::DATETIME;
         $value = '11/17/89';
 
-        $builder = new PropertyMetaDataBuilder($this->getAnnotationReaderMock());
+        $builder = new PropertyContextBuilder($this->getAnnotationReaderMock());
         $result  = $this->getReflectedMethod($builder, 'handleTypeConversion')->invoke($builder, $type, $value);
 
         $this->assertInstanceOf('DateTime', $result);

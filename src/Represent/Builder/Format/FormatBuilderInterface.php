@@ -2,9 +2,9 @@
 
 namespace Represent\Builder\Format;
 
-use Represent\MetaData\ClassMetaData;
+use Represent\Context\ClassContext;
 
 interface FormatBuilderInterface
 {
-    public function buildRepresentation($representation, $object, ClassMetaData $meta);
+    public function buildRepresentation($representation, $object, ClassContext $context);
 }

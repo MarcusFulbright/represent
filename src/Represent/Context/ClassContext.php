@@ -1,11 +1,11 @@
 <?php
 
-namespace Represent\MetaData;
+namespace Represent\Context;
 
 /**
-  * value object to hold meta data about the class
+  * Value object to hold meta data about the class
   */
-class ClassMetaData
+class ClassContext
 {
     public $policy;
 

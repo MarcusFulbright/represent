@@ -5,7 +5,7 @@ namespace Represent\Builder\Format;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Represent\Annotations\LinkCollection;
 use Represent\Generator\LinkGenerator;
-use Represent\MetaData\ClassMetaData;
+use Represent\Context\ClassContext;
 
 class HalFormatBuilder implements  FormatBuilderInterface
 {
@@ -31,16 +31,15 @@ class HalFormatBuilder implements  FormatBuilderInterface
 
     /**
      * Adds the _embedded and _links property to a generic representation
-     *
-     * @param               $representation
-     * @param               $object
-     * @param ClassMetaData $meta
+     * @param                                 $representation
+     * @param                                 $object
+     * @param \Represent\Context\ClassContext $context
      * @return mixed
      */
-    public function buildRepresentation($representation, $object, ClassMetaData $meta)
+    public function buildRepresentation($representation, $object, ClassCOntext $context)
     {
         $representation->_embedded = $this->getEmbedded($representation, $object, new \ReflectionClass($object));
-        $representation->_links    = $this->getLinks(new \ReflectionClass($object), $meta);
+        $representation->_links    = $this->getLinks(new \ReflectionClass($object), $context);
 
         return $representation;
     }
@@ -75,17 +74,17 @@ class HalFormatBuilder implements  FormatBuilderInterface
      * Handles getting _links
      *
      * @param               $reflection
-     * @param ClassMetaData $meta
+     * @param ClassContext  $context
      *
      * @return \stdClass
      */
-    private function getLinks(\ReflectionClass $reflection, ClassMetaData $meta)
+    private function getLinks(\ReflectionClass $reflection, ClassContext $context)
     {
         $links = new \stdClass();
         $annot = $this->reader->getClassAnnotation($reflection, '\Represent\Annotations\LinkCollection');
 
         if ($annot) {
-            $links = $this->parseLinks($annot, $meta, $links);
+            $links = $this->parseLinks($annot, $context, $links);
         }
 
         return $links;
@@ -95,14 +94,14 @@ class HalFormatBuilder implements  FormatBuilderInterface
      * Parses through link annotations and generates valid links
      *
      * @param LinkCollection $annot
-     * @param ClassMetaData  $meta
+     * @param ClassContext   $context
      * @param \stdClass      $output
      * @return \stdClass
      */
-    private function parseLinks(LinkCollection $annot, ClassMetaData $meta, \stdClass $output)
+    private function parseLinks(LinkCollection $annot, ClassContext $context, \stdClass $output)
     {
         foreach ($annot->links as $link) {
-            if ($meta->group && $meta->group != $link->group) {
+            if ($context->group && $context->group != $link->group) {
                 break;
             }
             $name          = $link->name;

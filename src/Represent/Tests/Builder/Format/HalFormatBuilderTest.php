@@ -3,7 +3,7 @@
 namespace Represent\Tests\Builder;
 
 use Represent\Builder\Format\HalFormatBuilder;
-use Represent\Tests\RepresentTestCase;
+use Represent\Test\RepresentTestCase;
 
 class HalBuilderTest extends RepresentTestCase
 {
@@ -51,7 +51,7 @@ class HalBuilderTest extends RepresentTestCase
         $group      = 'group';
         $name       = 'name';
         $uri        = 'www.example.com';
-        $meta       = $this->getClassMetaDataMock();
+        $context    = $this->getClassContextMock();
         $reader     = $this->getAnnotationReaderMock();
         $reflection = $this->getBasicReflectionClassMock();
         $annot      = $this->getLinkCollectionMock();
@@ -59,28 +59,28 @@ class HalBuilderTest extends RepresentTestCase
         $generator  = $this->getLinkGeneratorMock();
 
         $annot->links = array($link);
-        $meta->group  = null;
+        $context->group  = null;
         $link->group  = $group;
         $link->name   = $name;
         $generator->shouldReceive('generate')->with($link)->andReturn($uri);
         $reader->shouldReceive('getClassAnnotation')->with($reflection, '\Represent\Annotations\LinkCollection')->andReturn($annot);
 
         $builder = new HalFormatBuilder($reader, $generator);
-        $result  = $this->getReflectedMethod($builder, 'getLinks')->invoke($builder, $reflection, $meta);
+        $result  = $this->getReflectedMethod($builder, 'getLinks')->invoke($builder, $reflection, $context);
 
         $this->assertEquals($uri, $result->$name);
     }
 
     public function testGetLinksEmpty()
     {
-        $meta       = $this->getClassMetaDataMock();
+        $context    = $this->getClassContextMock();
         $reader     = $this->getAnnotationReaderMock();
         $reflection = $this->getBasicReflectionClassMock();
 
         $reader->shouldReceive('getClassAnnotation')->with($reflection, '\Represent\Annotations\LinkCollection')->andReturnNull();
 
         $builder = new HalFormatBuilder($reader, $this->getLinkGeneratorMock());
-        $result  = $this->getReflectedMethod($builder, 'getLinks')->invoke($builder, $reflection, $meta);
+        $result  = $this->getReflectedMethod($builder, 'getLinks')->invoke($builder, $reflection, $context);
 
         $this->assertEquals(new \stdClass(), $result);
     }
@@ -91,20 +91,20 @@ class HalBuilderTest extends RepresentTestCase
         $group     = 'group';
         $uri       = 'www.example.com';
         $annot     = $this->getLinkCollectionMock();
-        $meta      = $this->getClassMetaDataMock();
+        $context   = $this->getClassContextMock();
         $output    = \Mockery::mock('stdClass');
         $link      = $this->getLinkMock();
         $generator = $this->getLinkGeneratorMock();
 
         $annot->links = array($link);
-        $meta->group  = $group;
+        $context->group  = $group;
         $link->group  = $group;
         $link->name   = $name;
         $generator->shouldReceive('generate')->with($link)->andReturn($uri);
 
 
         $builder = new HalFormatBuilder($this->getAnnotationReaderMock(), $generator);
-        $result  = $this->getReflectedMethod($builder, 'parseLinks')->invoke($builder, $annot, $meta, $output);
+        $result  = $this->getReflectedMethod($builder, 'parseLinks')->invoke($builder, $annot, $context, $output);
 
         $this->assertEquals($result->$name, $uri);
     }
@@ -115,20 +115,20 @@ class HalBuilderTest extends RepresentTestCase
         $group     = 'group';
         $uri       = 'www.example.com';
         $annot     = $this->getLinkCollectionMock();
-        $meta      = $this->getClassMetaDataMock();
+        $context   = $this->getClassContextMock();
         $output    = \Mockery::mock('stdClass');
         $link      = $this->getLinkMock();
         $generator = $this->getLinkGeneratorMock();
 
         $annot->links = array($link);
-        $meta->group  = null;
+        $context->group  = null;
         $link->group  = $group;
         $link->name   = $name;
         $generator->shouldReceive('generate')->with($link)->andReturn($uri);
 
 
         $builder = new HalFormatBuilder($this->getAnnotationReaderMock(), $generator);
-        $result  = $this->getReflectedMethod($builder, 'parseLinks')->invoke($builder, $annot, $meta, $output);
+        $result  = $this->getReflectedMethod($builder, 'parseLinks')->invoke($builder, $annot, $context, $output);
 
         $this->assertEquals($result, $output);
     }

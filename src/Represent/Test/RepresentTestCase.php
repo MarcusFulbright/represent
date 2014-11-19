@@ -1,6 +1,6 @@
 <?php
 
-namespace Represent\Tests;
+namespace Represent\Test;
 
 class RepresentTestCase extends \PHPUnit_Framework_TestCase
 {
@@ -9,9 +9,9 @@ class RepresentTestCase extends \PHPUnit_Framework_TestCase
         return \Mockery::mock('\ReflectionClass');
     }
 
-    protected function getClassMetaDataMock()
+    protected function getClassContextMock()
     {
-        return \Mockery::mock('Represent\MetaData\ClassMetaData');
+        return \Mockery::mock('Represent\Context\ClassContext');
     }
 
     protected function getAnnotationReaderMock()
@@ -49,9 +49,9 @@ class RepresentTestCase extends \PHPUnit_Framework_TestCase
         return \Mockery::mock('Represent\Annotations\Property');
     }
 
-    protected function getPropertyMetaDataMock()
+    protected function getPropertyContextMock()
     {
-        return \Mockery::mock('Represent\MetaData\PropertyMetaData');
+        return \Mockery::mock('Represent\Context\PropertyContext');
     }
 
     protected function getLinkCollectionMock()
