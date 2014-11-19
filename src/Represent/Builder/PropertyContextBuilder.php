@@ -44,11 +44,10 @@ class PropertyContextBuilder
      */
     private function parseAnnotations(PropertyContext $context, \ReflectionProperty $property, $original)
     {
-        foreach ($this->annotationReader->getPropertyAnnotations($property) as $annot) {
-            switch (true):
-                case ($annot instanceof \Represent\Annotations\Property):
-                    $context = $this->handleRepresentProperty($property, $annot, $context, $original);
-            endswitch;
+        $annot = $this->annotationReader->getPropertyAnnotation($property, '\Represent\Annotations\Property');
+
+        if ($annot) {
+            $context = $this->handleRepresentProperty($property, $annot, $context, $original);
         }
 
         return $context;

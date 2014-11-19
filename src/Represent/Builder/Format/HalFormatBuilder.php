@@ -53,19 +53,24 @@ class HalFormatBuilder implements  FormatBuilderInterface
      */
     private function getEmbedded($representation, $object, \ReflectionClass $reflection)
     {
-        $embedded = new \stdClass();
+        $embedded   = new \stdClass();
+        $properties = $reflection->getProperties();
+        $reader     = $this->reader;
 
-        foreach ($reflection->getProperties() as $property) {
-            $annot = $this->reader->getPropertyAnnotation($property, '\Represent\Annotations\HalEmbedded');
+        array_walk(
+            $properties,
+            function (\ReflectionProperty $property) use ($object, $representation, $embedded, $reader) {
+                $annot = $reader->getPropertyAnnotation($property, '\Represent\Annotations\HalEmbedded');
 
-            if ($annot) {
-                $name  = $property->getName();
-                $value = $property->getValue($object);
+                if ($annot) {
+                    $name = $property->getName();
+                    $value = $property->getValue($object);
 
-                $embedded->$name = $value;
-                unset($representation->$name);
+                    $embedded->$name = $value;
+                    unset($representation->$name);
+                }
             }
-        }
+        );
 
         return $embedded;
     }
@@ -100,13 +105,17 @@ class HalFormatBuilder implements  FormatBuilderInterface
      */
     private function parseLinks(LinkCollection $annot, ClassContext $context, \stdClass $output)
     {
-        foreach ($annot->links as $link) {
-            if ($context->group && $context->group != $link->group) {
-                break;
+        $generator = $this->linkGenerator;
+        array_walk(
+            $annot->links,
+            function($link) use ($context, $output, $generator) {
+                if ($context->group && $context->group != $link->group) {
+                    exit;
+                }
+                    $name = $link->name;
+                    $output->$name = $generator->generate($link);
             }
-            $name          = $link->name;
-            $output->$name = $this->linkGenerator->generate($link);
-        }
+        );
 
         return $output;
     }
