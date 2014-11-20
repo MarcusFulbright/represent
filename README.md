@@ -248,9 +248,9 @@ use Represent\Annotations as Represent;
 class Car
 ```
 
-| Property | Required | Content                      |
-|----------|----------|------------------------------|
-| policy   | Yes      | ('whiteList'|'blackList')    |
+| Property | Required | Content                         |
+|----------|----------|---------------------------------|
+| policy   | Yes      | ('whiteList' or 'blackList')    |
 
 
 #### @Hide
@@ -313,10 +313,10 @@ class Car
 }
 ```
 
-| Property | Required |   Content                                      |
-|----------|----------|------------------------------------------------|
-|  Name    |   No     | string                                         |
-|  Type    |   No     | string (integer | string | boolean | datetime) |
+| Property | Required |   Content                                         |
+|----------|----------|---------------------------------------------------|
+|  Name    |   No     | string                                            |
+|  Type    |   No     | string (integer or string or boolean or datetime) |
 
 
 #### @View
@@ -369,9 +369,9 @@ class Car
 ```
 **@LinkCollection**
 
-| Property | Required | Content     |
-|----------|----------|-------------|
-| links    | Yes      | Array<Link> |
+| Property | Required | Content      |
+|----------|----------|--------------|
+| links    | Yes      | Array (Link) |
 
 **@Link**
 
