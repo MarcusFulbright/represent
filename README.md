@@ -313,10 +313,10 @@ class Car
 }
 ```
 
-| Property | Required |   Content                                        |
-|----------|----------|--------------------------------------------------|
-|  Name    |   No     | string                                           |
-|  Type    |   No     | string <(integer | string | boolean | datetime)> |
+| Property | Required |   Content                                      |
+|----------|----------|------------------------------------------------|
+|  Name    |   No     | string                                         |
+|  Type    |   No     | string (integer | string | boolean | datetime) |
 
 
 #### @View
@@ -339,9 +339,9 @@ class Car
 }
 ```
 
-| Property | Required | Content       |
-|----------|----------|---------------|
-|  name    | Yes      | array <string>|
+| Property | Required | Content        |
+|----------|----------|----------------|
+|  name    | Yes      | array (strings)|
 
 
 #### @LinkCollection && @Link
@@ -375,13 +375,13 @@ class Car
 
 **@Link**
 
-| Property   |  Required  | Content               |
-|------------|------------|-----------------------|
-| name       |   yes      |  string               |
-| uri        |   yes      |  string               |
-| parameters |   no       |  array <key => value> |
-| views      |   no       |  array <string>       |
-| absolute   |   no       |  boolean              |
+| Property   |  Required  | Content            |
+|------------|------------|--------------------|
+| name       |   yes      |  string            |
+| uri        |   yes      |  string            |
+| parameters |   no       |  array (key,value) |
+| views      |   no       |  array (string)    |
+| absolute   |   no       |  boolean           |
 
 
 #### @Embedded
