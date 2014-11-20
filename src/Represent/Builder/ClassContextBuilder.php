@@ -29,16 +29,16 @@ class ClassContextBuilder
      * Any new top level class annotations need a handler in here.
      *
      * @param \ReflectionClass $reflection
-     * @param                  $group
+     * @param                  $view
      * @return ClassContext
      */
-    public function buildClassContext(\ReflectionClass $reflection, $group = null)
+    public function buildClassContext(\ReflectionClass $reflection, $view = null)
     {
         $classContext = new ClassContext();
         $classContext = $this->handleExclusionPolicy($reflection, $classContext);
 
-        $classContext->group = $group;
-        $classContext = $this->handleGroup($classContext);
+        $classContext->view = $view;
+        $classContext = $this->handleView($classContext);
 
         return $classContext;
     }
@@ -113,11 +113,11 @@ class ClassContextBuilder
     }
 
     /**
-     * Takes ClassContext and checks that each property belongs to the given group.
+     * Takes ClassContext and checks that each property belongs to the given view.
      * @param \Represent\Context\ClassContext $classContext
      * @return ClassContext
      */
-    private function handleGroup(ClassContext $classContext)
+    private function handleView(ClassContext $classContext)
     {
         $properties = $classContext->properties;
         $reader     = $this->annotationReader;
@@ -125,9 +125,9 @@ class ClassContextBuilder
         $classContext->properties = array_filter(
             $properties,
             function ($property) use ($reader, $classContext) {
-                $annotation = $reader->getPropertyAnnotation($property,'\Represent\Annotations\Group');
+                $annotation = $reader->getPropertyAnnotation($property,'\Represent\Annotations\View');
 
-                return $annotation == null || in_array($classContext->group, $annotation->name);
+                return $annotation == null || in_array($classContext->view, $annotation->name);
             }
         );
 

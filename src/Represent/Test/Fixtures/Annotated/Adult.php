@@ -29,7 +29,7 @@ class Adult
 
     /**
      * @Represent\Property(type="integer")
-     * @Represent\Group(name="private")
+     * @Represent\View(name={"private"})
      */
     private $age;
 

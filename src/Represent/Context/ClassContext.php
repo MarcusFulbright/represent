@@ -11,5 +11,5 @@ class ClassContext
 
     public $properties = array();
 
-    public $group = null;
+    public $views = array();
 }

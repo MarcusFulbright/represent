@@ -20,11 +20,11 @@ class GenericSerializer implements JsonSerializerInterface
      * Handles serializing an object to json
      *
      * @param      $object
-     * @param null $group
+     * @param null $view
      * @return string
      */
-    public function toJson($object, $group = null)
+    public function toJson($object, $view = null)
     {
-        return json_encode($this->builder->buildRepresentation($object, $group));
+        return json_encode($this->builder->buildRepresentation($object, $view));
     }
 }

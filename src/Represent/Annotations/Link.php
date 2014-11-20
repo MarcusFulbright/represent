@@ -11,6 +11,6 @@ class Link
     public $name;
     public $uri;
     public $parameters = array();
-    public $group = array();
-    public $absolute = false;
+    public $views      = array();
+    public $absolute   = false;
 }

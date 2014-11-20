@@ -4,5 +4,5 @@ namespace Represent\Serializer;
 
 interface JsonSerializerInterface
 {
-    public function toJson($object, $group = null);
+    public function toJson($object, $view = null);
 }

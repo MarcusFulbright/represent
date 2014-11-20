@@ -32,7 +32,7 @@ class GenericSerializerTest extends RepresentTestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function testToJsonWithAnnotationsAndGroup()
+    public function testToJsonWithAnnotationsAndView()
     {
         $toy    = new Toy('brown', 'Golem', 'smash');
         $child  = new Child('Henry', 'Parish');

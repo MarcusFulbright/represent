@@ -5,7 +5,6 @@ namespace Represent\Builder\Format;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Represent\Annotations\LinkCollection;
 use Represent\Generator\LinkGenerator;
-use Represent\Context\ClassContext;
 
 class HalFormatBuilder implements  FormatBuilderInterface
 {
@@ -33,13 +32,13 @@ class HalFormatBuilder implements  FormatBuilderInterface
      * Adds the _embedded and _links property to a generic representation
      * @param      $representation
      * @param      $object
-     * @param null $group
+     * @param null $view
      * @return mixed
      */
-    public function buildRepresentation($representation, $object, $group = null)
+    public function buildRepresentation($representation, $object, $view = null)
     {
         $representation->_embedded = $this->getEmbedded($representation, new \ReflectionClass($object));
-        $representation->_links    = $this->getLinks(new \ReflectionClass($object), $group);
+        $representation->_links    = $this->getLinks(new \ReflectionClass($object), $view);
 
         return $representation;
     }
@@ -77,16 +76,16 @@ class HalFormatBuilder implements  FormatBuilderInterface
     /**
      * Handles getting _links
      * @param \ReflectionClass $reflection
-     * @param                  $group
+     * @param                  $view
      * @return \stdClass
      */
-    private function getLinks(\ReflectionClass $reflection, $group)
+    private function getLinks(\ReflectionClass $reflection, $view)
     {
         $links = new \stdClass();
         $annot = $this->reader->getClassAnnotation($reflection, '\Represent\Annotations\LinkCollection');
 
         if ($annot) {
-            $links = $this->parseLinks($annot, $group, $links);
+            $links = $this->parseLinks($annot, $view, $links);
         }
 
         return $links;
@@ -95,17 +94,17 @@ class HalFormatBuilder implements  FormatBuilderInterface
     /**
      * Parses through link annotations and generates valid links
      * @param LinkCollection $annot
-     * @param                $group
+     * @param                $view
      * @param \stdClass      $output
      * @return \stdClass
      */
-    private function parseLinks(LinkCollection $annot, $group, \stdClass $output)
+    private function parseLinks(LinkCollection $annot, $view, \stdClass $output)
     {
         $generator = $this->linkGenerator;
         array_walk(
             $annot->links,
-            function($link) use ($group, $output, $generator) {
-                if ($group == null || in_array($group, $link->group)) {
+            function($link) use ($view, $output, $generator) {
+                if ($view == null || in_array($view, $link->views)) {
                     $name = $link->name;
                     $output->$name = $generator->generate($link);
                 }

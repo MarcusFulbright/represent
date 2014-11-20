@@ -34,20 +34,20 @@ class GenericRepresentationBuilder
      * with keys and values
      *
      * @param $object
-     * @param string $group name of the group to be represented
+     * @param string $view name of the view to be represented
      * @return array|\stdClass
      * @throws \Exception
      */
-    public function buildRepresentation($object, $group = null)
+    public function buildRepresentation($object, $view = null)
     {
         switch (true):
             case $this->checkArrayCollection($object):
                 $object = $object->toArray();
             case is_array($object):
-                $output = $this->handleArray($object, $group);
+                $output = $this->handleArray($object, $view);
                 break;
             case is_object($object):
-                $output = $this->handleObject($object, $group);
+                $output = $this->handleObject($object, $view);
                 break;
             case is_null($object):
                 $output = array();
@@ -71,13 +71,13 @@ class GenericRepresentationBuilder
     /**
      * Used to handle representing objects
      * @param $object
-     * @param $group
+     * @param $view
      * @return \stdClass
      */
-    private function handleObject($object, $group)
+    private function handleObject($object, $view)
     {
         $reflection   = new \ReflectionClass($object);
-        $classContext = $this->classBuilder->buildClassContext($reflection, $group);
+        $classContext = $this->classBuilder->buildClassContext($reflection, $view);
         $output       = new \stdClass();
 
         foreach ($classContext->properties as $property) {
@@ -105,10 +105,10 @@ class GenericRepresentationBuilder
             case $this->checkArrayCollection($value):
                 $value = $value->toArray();
             case is_array($value);
-                $output->$name = $this->handleArray($value, $classContext->group);
+                $output->$name = $this->handleArray($value, $classContext->view);
                 break;
             case is_object($value);
-                $output->$name = $this->handleObject($value, $classContext->group);
+                $output->$name = $this->handleObject($value, $classContext->view);
                 break;
             default:
                 $output->$name = $value;
@@ -135,19 +135,19 @@ class GenericRepresentationBuilder
      * Can handle representing an array
      *
      * @param array $object
-     * @param string $group
+     * @param string $view
      * @return array
      */
-    private function handleArray(array $object, $group)
+    private function handleArray(array $object, $view)
     {
         $output = array();
         foreach ($object as $key => $value) {
             switch (true):;
                 case is_array($value):
-                    $output[$key] = $this->handleArray($value, $group);
+                    $output[$key] = $this->handleArray($value, $view);
                     break;
                 case is_object($value):
-                    $output[$key] = $this->handleObject($value, $group);
+                    $output[$key] = $this->handleObject($value, $view);
                     break;
                 default:
                     $output[$key] = $value;

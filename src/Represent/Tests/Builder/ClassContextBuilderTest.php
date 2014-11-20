@@ -8,24 +8,24 @@ use Represent\Test\RepresentTestCase;
 
 class ClassContextBuilderTest extends RepresentTestCase
 {
-    public function testBuildClassContextWithGroup()
+    public function testBuildClassContextWithView()
     {
         $class     = $this->getBasicReflectionClassMock();
         $reader    = $this->getAnnotationReaderMock();
         $property  = $this->getBasicReflectionPropertyMock();
-        $group     = $this->getGroupMock();
-        $groupName = 'test';
+        $view      = $this->getViewMock();
+        $viewName  = 'test';
         $context   = $this->getClassContextMock();
 
         $context->properties = array();
-        $group->name         = array($groupName);
+        $view->name          = array($viewName);
         $reader->shouldReceive('getClassAnnotation')->with($class, '\Represent\Annotations\ExclusionPolicy')->andReturnNull();
         $class->shouldReceive('getProperties')->andReturn(array($property));
         $reader->shouldReceive('getPropertyAnnotation')->with($property, '\Represent\Annotations\Hide')->andReturnNull();
-        $reader->shouldReceive('getPropertyAnnotation')->with($property, '\Represent\Annotations\Group')->andReturn($group);
+        $reader->shouldReceive('getPropertyAnnotation')->with($property, '\Represent\Annotations\View')->andReturn($view);
 
         $builder = new ClassContextBuilder($reader);
-        $result  = $builder->buildClassContext($class, $groupName);
+        $result  = $builder->buildClassContext($class, $viewName);
 
         $this->assertEquals(array($property), $result->properties);
     }
@@ -42,7 +42,7 @@ class ClassContextBuilderTest extends RepresentTestCase
         $reader->shouldReceive('getClassAnnotation')->with($class, '\Represent\Annotations\ExclusionPolicy')->andReturnNull();
         $class->shouldReceive('getProperties')->andReturn(array($property));
         $reader->shouldReceive('getPropertyAnnotation')->with($property, '\Represent\Annotations\Hide')->andReturnNull();
-        $reader->shouldReceive('getPropertyAnnotation')->with($property, '\Represent\Annotations\Group')->andReturnNull();
+        $reader->shouldReceive('getPropertyAnnotation')->with($property, '\Represent\Annotations\View')->andReturnNull();
 
         $builder = new ClassContextBuilder($reader);
         $result  = $builder->buildClassContext($class);
@@ -187,39 +187,39 @@ class ClassContextBuilderTest extends RepresentTestCase
         $this->assertTrue(empty($result->properties));
     }
 
-    public function testHandleGroupTrue()
+    public function testHandleViewTrue()
     {
         $context   = $this->getClassContextMock();
         $reader    = $this->getAnnotationReaderMock();
         $property  = $this->getBasicReflectionPropertyMock();
-        $group     = $this->getGroupMock();
-        $groupName = 'test';
+        $view      = $this->getViewMock();
+        $viewName = 'test';
 
         $context->properties = array($property);
-        $context->group      = $groupName;
-        $group->name      = array($groupName);
-        $reader->shouldReceive('getPropertyAnnotation')->with($property, '\Represent\Annotations\Group')->andReturn($group);
+        $context->view       = $viewName;
+        $view->name          = array($viewName);
+        $reader->shouldReceive('getPropertyAnnotation')->with($property, '\Represent\Annotations\View')->andReturn($view);
 
         $builder = new ClassContextBuilder($reader);
-        $result  = $this->getReflectedMethod($builder, 'handleGroup')->invoke($builder, $context);
+        $result  = $this->getReflectedMethod($builder, 'handleView')->invoke($builder, $context);
 
         $this->assertEquals(array($property), $result->properties);
     }
 
-    public function testHandleGroupFalse()
+    public function testHandleViewFalse()
     {
         $context  = $this->getClassContextMock();
         $reader   = $this->getAnnotationReaderMock();
         $property = $this->getBasicReflectionPropertyMock();
-        $group    = $this->getGroupMock();
+        $view    = $this->getViewMock();
 
         $context->properties = array($property);
-        $context->group      = 'wrong';
-        $group->name      = array('test');
-        $reader->shouldReceive('getPropertyAnnotation')->with($property, '\Represent\Annotations\Group')->andReturn($group);
+        $context->view       = 'wrong';
+        $view->name          = array('test');
+        $reader->shouldReceive('getPropertyAnnotation')->with($property, '\Represent\Annotations\View')->andReturn($view);
 
         $builder = new ClassContextBuilder($reader);
-        $result  = $this->getReflectedMethod($builder, 'handleGroup')->invoke($builder, $context);
+        $result  = $this->getReflectedMethod($builder, 'handleView')->invoke($builder, $context);
 
         $this->assertTrue(empty($result->properties));
     }

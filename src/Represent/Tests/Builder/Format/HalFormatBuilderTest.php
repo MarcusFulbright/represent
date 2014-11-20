@@ -48,7 +48,6 @@ class HalBuilderTest extends RepresentTestCase
 
     public function testGetLinks()
     {
-        $group      = 'group';
         $name       = 'name';
         $uri        = 'www.example.com';
         $reader     = $this->getAnnotationReaderMock();
@@ -58,13 +57,12 @@ class HalBuilderTest extends RepresentTestCase
         $generator  = $this->getLinkGeneratorMock();
 
         $annot->links = array($link);
-        $link->group  = array($group);
         $link->name   = $name;
         $generator->shouldReceive('generate')->with($link)->andReturn($uri);
         $reader->shouldReceive('getClassAnnotation')->with($reflection, '\Represent\Annotations\LinkCollection')->andReturn($annot);
 
         $builder = new HalFormatBuilder($reader, $generator);
-        $result  = $this->getReflectedMethod($builder, 'getLinks')->invoke($builder, $reflection, $group);
+        $result  = $this->getReflectedMethod($builder, 'getLinks')->invoke($builder, $reflection, null);
 
         $this->assertEquals($uri, $result->$name);
     }
@@ -86,7 +84,7 @@ class HalBuilderTest extends RepresentTestCase
     public function testParseLinks()
     {
         $name      = 'name';
-        $group     = 'group';
+        $view      = 'view';
         $uri       = 'www.example.com';
         $annot     = $this->getLinkCollectionMock();
         $output    = \Mockery::mock('stdClass');
@@ -94,35 +92,35 @@ class HalBuilderTest extends RepresentTestCase
         $generator = $this->getLinkGeneratorMock();
 
         $annot->links = array($link);
-        $link->group  = array($group);
+        $link->views  = array($view);
         $link->name   = $name;
         $generator->shouldReceive('generate')->with($link)->andReturn($uri);
 
 
         $builder = new HalFormatBuilder($this->getAnnotationReaderMock(), $generator);
-        $result  = $this->getReflectedMethod($builder, 'parseLinks')->invoke($builder, $annot, $group, $output);
+        $result  = $this->getReflectedMethod($builder, 'parseLinks')->invoke($builder, $annot, $view, $output);
 
         $this->assertEquals($result->$name, $uri);
     }
 
-    public function testParseLinksRespectsGroups()
+    public function testParseLinksRespectsViews()
     {
         $name      = 'name';
-        $group     = 'group';
+        $view      = 'view';
         $uri       = 'www.example.com';
         $annot     = $this->getLinkCollectionMock();
         $output    = \Mockery::mock('stdClass');
         $link      = $this->getLinkMock();
         $generator = $this->getLinkGeneratorMock();
 
-        $annot->links = array($link);
-        $link->group  = array($group);
-        $link->name   = $name;
+        $annot->links  = array($link);
+        $link->views   = array($view);
+        $link->name    = $name;
         $generator->shouldReceive('generate')->with($link)->andReturn($uri);
 
 
         $builder = new HalFormatBuilder($this->getAnnotationReaderMock(), $generator);
-        $result  = $this->getReflectedMethod($builder, 'parseLinks')->invoke($builder, $annot, $group, $output);
+        $result  = $this->getReflectedMethod($builder, 'parseLinks')->invoke($builder, $annot, $view, $output);
 
         $this->assertEquals($result, $output);
     }

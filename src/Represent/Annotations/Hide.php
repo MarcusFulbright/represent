@@ -8,5 +8,4 @@ namespace Represent\Annotations;
  */
 class Hide
 {
-
 }

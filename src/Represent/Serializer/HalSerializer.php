@@ -27,13 +27,13 @@ class HalSerializer Implements JsonSerializerInterface
      * Handles serializing an object to json
      *
      * @param      $object
-     * @param null $group
+     * @param null $view
      * @return string
      */
-    public function toJson($object, $group = null)
+    public function toJson($object, $view = null)
     {
-        $representation = $this->generic->buildRepresentation($object, $group);
+        $representation = $this->generic->buildRepresentation($object, $view);
 
-        return json_encode($this->format->buildRepresentation($representation, $object, $group));
+        return json_encode($this->format->buildRepresentation($representation, $object, $view));
     }
 }

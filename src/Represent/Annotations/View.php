@@ -6,10 +6,10 @@ namespace Represent\Annotations;
  * @Annotation
  * @Target({"PROPERTY"})
  */
-class Group 
+class View
 {
    /**
     * @var array
     */
-    public $name;
+    public $name = array();
 }
