@@ -10,6 +10,7 @@ class View
 {
    /**
     * @var array
+    * @Required
     */
     public $name = array();
 }

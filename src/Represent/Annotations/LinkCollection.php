@@ -8,5 +8,8 @@ namespace Represent\Annotations;
  */
 class LinkCollection 
 {
+    /**
+     * @Required
+     */
     public $links = array();
 }

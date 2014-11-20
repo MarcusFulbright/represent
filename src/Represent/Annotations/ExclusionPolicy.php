@@ -10,6 +10,9 @@ use Represent\Enum\ExclusionPolicyEnum;
  */
 class ExclusionPolicy
 {
+    /**
+     * @Required
+     */
     private $policy;
 
     public function __construct(array $options)
