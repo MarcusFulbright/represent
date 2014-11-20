@@ -74,6 +74,11 @@ class RepresentTestCase extends \PHPUnit_Framework_TestCase
         return \Mockery::mock('Represent\Annotations\Embedded');
     }
 
+    protected function getUrlGeneratorMock()
+    {
+        return \Mockery::mock('Symfony\Component\Routing\Generator\UrlGenerator');
+    }
+
     /**
      * Creates a reflection method and makes it accessible
      *

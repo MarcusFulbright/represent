@@ -31,15 +31,15 @@ class HalFormatBuilder implements  FormatBuilderInterface
 
     /**
      * Adds the _embedded and _links property to a generic representation
-     * @param                                 $representation
-     * @param                                 $object
-     * @param \Represent\Context\ClassContext $context
+     * @param      $representation
+     * @param      $object
+     * @param null $group
      * @return mixed
      */
-    public function buildRepresentation($representation, $object, ClassCOntext $context)
+    public function buildRepresentation($representation, $object, $group = null)
     {
-        $representation->_embedded = $this->getEmbedded($representation, $object, new \ReflectionClass($object));
-        $representation->_links    = $this->getLinks(new \ReflectionClass($object), $context);
+        $representation->_embedded = $this->getEmbedded($representation, new \ReflectionClass($object));
+        $representation->_links    = $this->getLinks(new \ReflectionClass($object), $group);
 
         return $representation;
     }
@@ -47,11 +47,10 @@ class HalFormatBuilder implements  FormatBuilderInterface
     /**
      * Handles moving embedded properties to _embedded
      * @param                  $representation
-     * @param                  $object
      * @param \ReflectionClass $reflection
      * @return \stdClass
      */
-    private function getEmbedded($representation, $object, \ReflectionClass $reflection)
+    private function getEmbedded($representation, \ReflectionClass $reflection)
     {
         $embedded   = new \stdClass();
         $properties = $reflection->getProperties();
@@ -59,13 +58,13 @@ class HalFormatBuilder implements  FormatBuilderInterface
 
         array_walk(
             $properties,
-            function (\ReflectionProperty $property) use ($object, $representation, $embedded, $reader) {
-                $annot = $reader->getPropertyAnnotation($property, '\Represent\Annotations\HalEmbedded');
+            function (\ReflectionProperty $property) use ($representation, $embedded, $reader) {
+                $property->setAccessible(true);
+                $annot = $reader->getPropertyAnnotation($property, '\Represent\Annotations\Embedded');
 
                 if ($annot) {
-                    $name = $property->getName();
-                    $value = $property->getValue($object);
-
+                    $name  = $property->getName();
+                    $value = $representation->$name;
                     $embedded->$name = $value;
                     unset($representation->$name);
                 }
@@ -77,19 +76,17 @@ class HalFormatBuilder implements  FormatBuilderInterface
 
     /**
      * Handles getting _links
-     *
-     * @param               $reflection
-     * @param ClassContext  $context
-     *
+     * @param \ReflectionClass $reflection
+     * @param                  $group
      * @return \stdClass
      */
-    private function getLinks(\ReflectionClass $reflection, ClassContext $context)
+    private function getLinks(\ReflectionClass $reflection, $group)
     {
         $links = new \stdClass();
         $annot = $this->reader->getClassAnnotation($reflection, '\Represent\Annotations\LinkCollection');
 
         if ($annot) {
-            $links = $this->parseLinks($annot, $context, $links);
+            $links = $this->parseLinks($annot, $group, $links);
         }
 
         return $links;
@@ -97,23 +94,21 @@ class HalFormatBuilder implements  FormatBuilderInterface
 
     /**
      * Parses through link annotations and generates valid links
-     *
      * @param LinkCollection $annot
-     * @param ClassContext   $context
+     * @param                $group
      * @param \stdClass      $output
      * @return \stdClass
      */
-    private function parseLinks(LinkCollection $annot, ClassContext $context, \stdClass $output)
+    private function parseLinks(LinkCollection $annot, $group, \stdClass $output)
     {
         $generator = $this->linkGenerator;
         array_walk(
             $annot->links,
-            function($link) use ($context, $output, $generator) {
-                if ($context->group && $context->group != $link->group) {
-                    exit;
-                }
+            function($link) use ($group, $output, $generator) {
+                if ($group == null || in_array($group, $link->group)) {
                     $name = $link->name;
                     $output->$name = $generator->generate($link);
+                }
             }
         );
 

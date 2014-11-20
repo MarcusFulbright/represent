@@ -29,10 +29,10 @@ class LinkGenerator
     {
         foreach ($link->parameters as $param) {
             $matches = array();
-            preg_match("expr('(.+)'", $param, $matches);
+            preg_match("/'expr'/", $param, $matches);
 
             if (!empty($matches)) {
-                $link->$param = $this->language->evaluate($matches[0]);
+                $link->$param = $this->language->evaluate($param);
             }
         }
 
