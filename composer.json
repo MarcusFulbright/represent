@@ -1,5 +1,5 @@
 {
-    "name": "marcusfulbright/represent",
+    "name": "represent/represent",
     "type": "library",
     "description": "Tools that can build differient representations of objects",
     "keywords": ["representor", "rest", "api", "hypermedia"],
