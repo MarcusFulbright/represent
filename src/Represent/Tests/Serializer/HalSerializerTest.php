@@ -34,7 +34,7 @@ class HalSerializerTest extends RepresentTestCase
 
         $urlGenerator->shouldReceive('generate')->andReturn('www.example.com/selfLink');
 
-        $result = $serializer->toJson($parent);
+        $result = $serializer->serialize($parent, 'hal+json');
         $expected = '{"First Name":"Ichabod","Last Name":"Crane","_embedded":{"children":[{"First Name":"Henry","Last Name":"Parish","toys":[{"color":"brown","name":"Golem","sound":"smash"}]}]},"_links":{"self":"www.example.com\/selfLink"}}';
 
         $this->assertEquals($expected, $result);

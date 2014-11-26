@@ -26,7 +26,7 @@ class GenericSerializerTest extends RepresentTestCase
         $builder    = new GenericRepresentationBuilder(new PropertyContextBuilder($reader), new ClassContextBuilder($reader));
         $serializer = new GenericSerializer($builder);
 
-        $result = $serializer->toJson($parent);
+        $result = $serializer->serialize($parent, 'json');
         $expected = '{"First Name":"Ichabod","Last Name":"Crane","children":[{"First Name":"Henry","Last Name":"Parish","toys":[{"color":"brown","name":"Golem","sound":"smash"}]}]}';
 
         $this->assertEquals($expected, $result);
@@ -44,7 +44,7 @@ class GenericSerializerTest extends RepresentTestCase
         $builder    = new GenericRepresentationBuilder(new PropertyContextBuilder($reader), new ClassContextBuilder($reader));
         $serializer = new GenericSerializer($builder);
 
-        $result = $serializer->toJson($parent, 'private');
+        $result = $serializer->serialize($parent, 'json', 'private');
         $expected = '{"First Name":"Ichabod","Last Name":"Crane","age":40,"children":[{"First Name":"Henry","Last Name":"Parish","toys":[{"color":"brown","name":"Golem","sound":"smash"}]}]}';
 
         $this->assertEquals($expected, $result);

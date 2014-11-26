@@ -4,16 +4,36 @@ namespace Represent\Serializer;
 
 use Represent\Builder\GenericRepresentationBuilder;
 
-class GenericSerializer implements JsonSerializerInterface
+class GenericSerializer implements RepresentSerializerInterface
 {
     /**
      * @var \Represent\Builder\GenericRepresentationBuilder
      */
-    private $builder;
+    private $genericBuilder;
 
-    public function __construct(GenericRepresentationBuilder $builder)
+    /**
+     * @var array
+     */
+    private $formatMap = array('json' => 'toJson');
+
+    public function __construct(GenericRepresentationBuilder $genericBuilder)
     {
-        $this->builder = $builder;
+        $this->genericBuilder = $genericBuilder;
+    }
+
+    public function serialize($object, $format, $view = null)
+    {
+        if (!$this->supports($format)) {
+            throw new \Exception(get_class($this).' is not configured to support the format: '.$format);
+        }
+        $method = $this->formatMap[$format];
+
+        return $this->$method($object, $view);
+    }
+
+    public function supports($format)
+    {
+        return array_key_exists($format, $this->formatMap);
     }
 
     /**
@@ -23,8 +43,8 @@ class GenericSerializer implements JsonSerializerInterface
      * @param null $view
      * @return string
      */
-    public function toJson($object, $view = null)
+    private function toJson($object, $view = null)
     {
-        return json_encode($this->builder->buildRepresentation($object, $view));
+        return json_encode($this->genericBuilder->buildRepresentation($object, $view));
     }
 }

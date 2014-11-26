@@ -79,6 +79,11 @@ class RepresentTestCase extends \PHPUnit_Framework_TestCase
         return \Mockery::mock('Symfony\Component\Routing\Generator\UrlGenerator');
     }
 
+    protected function getRepresentSerializerInterfaceMock()
+    {
+        return \Mockery::mock('Represent\Serializer\RepresentSerializerInterface');
+    }
+
     /**
      * Creates a reflection method and makes it accessible
      *

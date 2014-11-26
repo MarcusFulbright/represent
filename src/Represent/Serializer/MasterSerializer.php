@@ -2,41 +2,36 @@
 
 namespace Represent\Serializer;
 
-class MasterSerializer
+/**
+ * Handles supporting serialization of multiple formats
+ */
+class MasterSerializer implements RepresentSerializerInterface
 {
     /**
-     * @var HalSerializer
+     * @var array
      */
-    private $hal;
+    private $configs = array();
 
     /**
-     * @var GenericSerializer
+     * Takes any number of arrays with the following format:
+     * array('format' => $serializer);
      */
-    private $generic;
-
-    public function __construct(GenericSerializer $generic, HalSerializer $hal)
+    public function __construct(array $formatMap)
     {
-        $this->generic = $generic;
-        $this->hal  = $hal;
+        foreach ($formatMap as $format => $serializer) {
+            if (!$serializer instanceof RepresentSerializerInterface) { //need to make this interface
+                throw new \Exception('Serializers must implement MySerializerInterface');
+            }
+            $this->configs[$format] = $serializer;
+        }
     }
 
-    /**
-     * Can handle parsing through all available formats and serializing accordingly
-     *
-     * @param $object
-     * @param $format
-     * @return string
-     */
-    public function serialize($object, $format)
+    public function serialize($object, $format, $view = null)
     {
-        switch ($format):
-            case 'application/json':
-                $output = $this->generic->toJson($object);
-                break;
-            case 'application/hal+json':
-                $output = $this->hal->toJson($object);
-         endswitch;
+        if (!array_key_exists($format, $this->configs)) {
+            throw new \Exception($format.' is not configured');
+        }
 
-        return $output;
+        return $this->configs[$format]->serialize($object, $format, $view);
     }
 }

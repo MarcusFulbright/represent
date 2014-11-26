@@ -5,22 +5,42 @@ namespace Represent\Serializer;
 use Represent\Builder\Format\FormatBuilderInterface;
 use Represent\Builder\GenericRepresentationBuilder;
 
-class HalSerializer Implements JsonSerializerInterface
+class HalSerializer implements RepresentSerializerInterface
 {
     /**
      * @var \Represent\Builder\Format\FormatBuilderInterface
      */
-    private $format;
+    private $formatBuilder;
 
     /**
      * @var \Represent\Builder\GenericRepresentationBuilder
      */
-    private $generic;
+    private $genericBuilder;
+
+    /**
+     * @var array
+     */
+    private $formatMap = array('hal+json' => 'toJson');
 
     public function __construct(FormatBuilderInterface $formatBuilder, GenericRepresentationBuilder $genericBuilder)
     {
-        $this->generic = $genericBuilder;
-        $this->format  = $formatBuilder;
+        $this->genericBuilder = $genericBuilder;
+        $this->formatBuilder  = $formatBuilder;
+    }
+
+    public function serialize($object, $format, $view = null)
+    {
+        if (!$this->supports($format)) {
+            throw new \Exception(get_class($this).' is not configured to support the format: '.$format);
+        }
+        $method = $this->formatMap[$format];
+
+        return $this->$method($object, $view);
+    }
+
+    public function supports($format)
+    {
+        return array_key_exists($format, $this->formatMap);
     }
 
     /**
@@ -30,10 +50,10 @@ class HalSerializer Implements JsonSerializerInterface
      * @param null $view
      * @return string
      */
-    public function toJson($object, $view = null)
+    private function toJson($object, $view = null)
     {
-        $representation = $this->generic->buildRepresentation($object, $view);
+        $representation = $this->genericBuilder->buildRepresentation($object, $view);
 
-        return json_encode($this->format->buildRepresentation($representation, $object, $view));
+        return json_encode($this->formatBuilder->buildRepresentation($representation, $object, $view));
     }
 }
