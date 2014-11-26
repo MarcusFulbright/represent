@@ -10,7 +10,7 @@ class MasterSerializer implements RepresentSerializerInterface
     /**
      * @var array
      */
-    private $configs = array();
+    private $formatMap = array();
 
     /**
      * Takes any number of arrays with the following format:
@@ -22,16 +22,21 @@ class MasterSerializer implements RepresentSerializerInterface
             if (!$serializer instanceof RepresentSerializerInterface) { //need to make this interface
                 throw new \Exception('Serializers must implement MySerializerInterface');
             }
-            $this->configs[$format] = $serializer;
+            $this->formatMap[$format] = $serializer;
         }
     }
 
     public function serialize($object, $format, $view = null)
     {
-        if (!array_key_exists($format, $this->configs)) {
+        if (!array_key_exists($format, $this->formatMap)) {
             throw new \Exception($format.' is not configured');
         }
 
-        return $this->configs[$format]->serialize($object, $format, $view);
+        return $this->formatMap[$format]->serialize($object, $format, $view);
+    }
+
+    public function supports($format)
+    {
+        return array_key_exists($format, $this->formatMap);
     }
 }
