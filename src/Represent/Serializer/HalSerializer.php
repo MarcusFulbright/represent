@@ -54,6 +54,10 @@ class HalSerializer implements RepresentSerializerInterface
     {
         $representation = $this->genericBuilder->buildRepresentation($object, $view);
 
-        return json_encode($this->formatBuilder->buildRepresentation($representation, $object, $view));
+        return str_replace(
+            "\/",
+            "/",
+            json_encode($this->formatBuilder->buildRepresentation($representation, $object, $view))
+        );
     }
 }
