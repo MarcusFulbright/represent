@@ -15,7 +15,8 @@
         "php": ">=5.3.9",
         "doctrine/common": "2.4.*",
         "symfony/expression-language": "~2.4",
-        "symfony/http-foundation": "2.5.7"
+        "symfony/http-foundation": "2.5.7",
+        "pagerfanta/pagerfanta": "~1.0"
     },
     "require-dev": {
         "symfony/routing": "~2.0",
