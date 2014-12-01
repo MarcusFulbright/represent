@@ -59,6 +59,7 @@ class HalBuilderTest extends RepresentTestCase
         $annot->links = array($link);
         $link->name   = $name;
         $generator->shouldReceive('generate')->with($link)->andReturn($uri);
+        $generator->shouldReceive('parseName')->with($link)->andReturn($name);
         $reader->shouldReceive('getClassAnnotation')->with($reflection, '\Represent\Annotations\LinkCollection')->andReturn($annot);
 
         $builder = new HalFormatBuilder($reader, $generator);
@@ -95,6 +96,7 @@ class HalBuilderTest extends RepresentTestCase
         $link->views  = array($view);
         $link->name   = $name;
         $generator->shouldReceive('generate')->with($link)->andReturn($uri);
+        $generator->shouldReceive('parseName')->with($link)->andReturn($name);
 
 
         $builder = new HalFormatBuilder($this->getAnnotationReaderMock(), $generator);
@@ -112,6 +114,7 @@ class HalBuilderTest extends RepresentTestCase
         $output    = \Mockery::mock('stdClass');
         $link      = $this->getLinkMock();
         $generator = $this->getLinkGeneratorMock();
+        $generator->shouldReceive('parseName')->with($link)->andReturn($name);
 
         $annot->links  = array($link);
         $link->views   = array($view);

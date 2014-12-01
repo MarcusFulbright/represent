@@ -2,11 +2,25 @@
 
 namespace Represent\Factory;
 
+use Represent\Annotations\Link;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ResponseFactory
 {
+    /**
+     * @var PaginationFactory
+     */
+    private $paginationFactory;
+
+    /**
+     * @param PaginationFactory $paginationFactory
+     */
+    public function __construct(PaginationFactory $paginationFactory)
+    {
+        $this->paginationFactory = $paginationFactory;
+    }
+
     /**
      * Handles creating a streaming response for the given file path and uses the given file name
      *
@@ -22,6 +36,23 @@ class ResponseFactory
         $this->setStreamHeaders($response, $fileName, $type);
 
         return $response;
+    }
+
+    /**
+     * Handles putting an array ($data) into a PaginatedCollection
+     *
+     * @param array $data
+     * @param Link  $link
+     * @param int   $page
+     * @param int   $limit
+     * @return \Represent\Util\PaginatedCollection
+     */
+    public function preparePagination(array $data, Link $link, $page = 1, $limit = 10)
+    {
+        return $this->paginationFactory->paginatedRepresentation(
+            $this->paginationFactory->makePagerFromArray($data, $page, $limit),
+            $link
+        );
     }
 
     /**

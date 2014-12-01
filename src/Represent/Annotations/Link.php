@@ -18,9 +18,18 @@ class Link
      */
     public $uri;
 
+    /**
+     * @var array
+     */
     public $parameters = array();
 
-    public $views      = array();
+    /**
+     * @var array
+     */
+    public $views = array();
 
-    public $absolute   = false;
+    /**
+     * @var bool
+     */
+    public $absolute = false;
 }

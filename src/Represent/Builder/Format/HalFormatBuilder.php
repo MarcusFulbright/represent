@@ -105,7 +105,7 @@ class HalFormatBuilder implements  FormatBuilderInterface
             $annot->links,
             function($link) use ($view, $output, $generator) {
                 if ($view == null || in_array($view, $link->views)) {
-                    $name = $link->name;
+                    $name = $generator->parseName($link);
                     $output->$name = $generator->generate($link);
                 }
             }

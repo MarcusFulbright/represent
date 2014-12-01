@@ -84,6 +84,21 @@ class RepresentTestCase extends \PHPUnit_Framework_TestCase
         return \Mockery::mock('Represent\Serializer\RepresentSerializerInterface');
     }
 
+    protected function getExpressionLangaugeMock()
+    {
+        return \Mockery::mock('Symfony\Component\ExpressionLanguage\ExpressionLanguage');
+    }
+
+    protected function getPagerMock()
+    {
+        return \Mockery::mock('Pagerfanta\Pagerfanta');
+    }
+
+    protected function getPaginationFactoryMock()
+    {
+        return \Mockery::mock('Represent\Factory\PaginationFactory');
+    }
+
     /**
      * Creates a reflection method and makes it accessible
      *

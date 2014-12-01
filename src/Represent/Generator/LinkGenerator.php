@@ -8,34 +8,74 @@ use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
 class LinkGenerator 
 {
+    /**
+     * @var \Symfony\Component\Routing\Generator\UrlGeneratorInterface
+     */
     private $urlGenerator;
 
+    /**
+     * @var \Symfony\Component\ExpressionLanguage\ExpressionLanguage
+     */
     private $language;
 
+    /**
+     * @param SymfonyUrlGeneratorInterface $urlGenerator
+     * @param ExpressionLanguage           $language
+     */
     public function __construct(SymfonyUrlGeneratorInterface $urlGenerator, ExpressionLanguage $language)
     {
         $this->urlGenerator = $urlGenerator;
         $this->language     = $language;
     }
 
+    /**
+     * @param Link $link
+     * @return string
+     */
     public function generate(Link $link)
     {
-        $link = $this->evaluateExpressions($link);
+        $link = $this->parseParams($link);
 
         return $this->urlGenerator->generate($link->name, $link->parameters, $link->absolute);
     }
 
-    private function evaluateExpressions(Link $link)
+    /**
+     * @param Link $link
+     * @return string
+     */
+    public function parseName(Link $link)
     {
-        foreach ($link->parameters as $param) {
-            $matches = array();
-            preg_match("/'expr'/", $param, $matches);
+        return $this->evaluateExpression($link->name);
+    }
 
-            if (!empty($matches)) {
-                $link->$param = $this->language->evaluate($param);
-            }
+    /**
+     * @param Link $link
+     * @return Link
+     */
+    public function parseParams(Link $link)
+    {
+        foreach ($link->parameters as $key => $value) {
+            $link->$key = $this->evaluateExpression($value);
         }
 
         return $link;
+    }
+
+    /**
+     * @param       $haystack
+     * @param array $matches
+     * @return string
+     */
+    private function evaluateExpression($haystack, array $matches = array())
+    {
+        preg_match("/\'(.*)\'/", $haystack, $matches);
+
+        if (!empty($matches)) {
+            $output = $this->language->evaluate($matches[0]);
+        } else {
+            $output = $haystack;
+        }
+
+        return $output;
     }
 }
