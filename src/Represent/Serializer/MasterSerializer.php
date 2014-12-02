@@ -19,8 +19,8 @@ class MasterSerializer implements RepresentSerializerInterface
     public function __construct(array $formatMap)
     {
         foreach ($formatMap as $format => $serializer) {
-            if (!$serializer instanceof RepresentSerializerInterface) { //need to make this interface
-                throw new \Exception('Serializers must implement MySerializerInterface');
+            if (!$serializer instanceof RepresentSerializerInterface) {
+                throw new \Exception('Serializers must implement RepresentSerializerInterface');
             }
             $this->formatMap[$format] = $serializer;
         }

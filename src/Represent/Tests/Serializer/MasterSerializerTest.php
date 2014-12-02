@@ -13,7 +13,7 @@ class MasterSerializerTest extends RepresentTestCase
             'json' => $this->getUrlGeneratorMock()
         );
 
-        $this->setExpectedException('Exception', 'Serializers must implement MySerializerInterface');
+        $this->setExpectedException('Exception', 'Serializers must implement RepresentSerializerInterface');
         new MasterSerializer($formatMap);
     }
 
