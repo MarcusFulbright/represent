@@ -3,6 +3,7 @@
 namespace Represent\Builder;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use MyProject\Proxies\__CG__\stdClass;
 use Represent\Builder\ClassContextBuilder;
 use Represent\Context\ClassContext;
 
@@ -22,6 +23,11 @@ class GenericRepresentationBuilder
      * @var ClassContextBuilder
      */
     private $classBuilder;
+
+    /**
+     * @var array
+     */
+    private $visited = array();
 
     public function __construct(PropertyContextBuilder $propertyBuilder, ClassContextBuilder $classBuilder)
     {
@@ -76,9 +82,21 @@ class GenericRepresentationBuilder
      */
     private function handleObject($object, $view)
     {
-        $reflection   = new \ReflectionClass($object);
-        $classContext = $this->classBuilder->buildClassContext($reflection, $view);
-        $output       = new \stdClass();
+        $hash   = spl_object_hash($object);
+        $check  = array_search($hash, $this->visited);
+        $output = new \stdClass();
+
+        if ($check !== false) {
+            $output = new \stdClass();
+            $rel = '$rel';
+            $output->$rel = $check;
+
+            return $output;
+        }
+        $output->_hash = count($this->visited);
+        $this->visited[] = $hash;
+        $reflection      = new \ReflectionClass($object);
+        $classContext    = $this->classBuilder->buildClassContext($reflection, $hash, $view);
 
         foreach ($classContext->properties as $property) {
             $output = $this->handleProperty($property, $object, $output, $classContext);
@@ -105,10 +123,10 @@ class GenericRepresentationBuilder
             case $this->checkArrayCollection($value):
                 $value = $value->toArray();
             case is_array($value);
-                $output->$name = $this->handleArray($value, $classContext->view);
+                $output->$name = $this->handleArray($value, $classContext->views);
                 break;
             case is_object($value);
-                $output->$name = $this->handleObject($value, $classContext->view);
+                $output->$name = $this->handleObject($value, $classContext->views);
                 break;
             default:
                 $output->$name = $value;

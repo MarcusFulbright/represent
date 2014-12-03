@@ -13,6 +13,52 @@ use Represent\Builder\ClassContextBuilder;
 
 class GenericRepresentationBuilderTest extends RepresentTestCase
 {
+    public function testBuildRepresentationCircularReference()
+    {
+        $parent = new Adult('first', 'last', 20, array(1,2,array(3,4)));
+
+        $child = new Child('first', 'last', $parent);
+        $child->addToy(new Toy('red', 'joe', 'vhroom'));
+
+        $parent->addChild($child);
+
+        $builder = $this->getGenericRepresentationBuilder();
+        $result  = $builder->buildRepresentation($parent);
+
+        $toyResult        = new \stdClass();
+        $toyResult->color = 'red';
+        $toyResult->name  = 'joe';
+        $toyResult->sound = 'vhroom';
+        $toyResult->_hash = 2;
+
+        $relResult = new \stdClass();
+        $name  = '$rel';
+        $relResult->$name = 0;
+
+        $childResult            = new \stdClass();
+        $childResult->firstName = 'first';
+        $childResult->lastName  = 'last';
+        $childResult->toys      = array($toyResult);
+        $childResult->_hash     = 1;
+        $childResult->parent    = $relResult;
+
+        $expected             = new \stdClass();
+        $expected->_hash      = 0;
+        $expected->firstName  = 'first';
+        $expected->lastName   = 'last';
+        $expected->age        = 20;
+        $expected->publicTest = array(
+            1,
+            2,
+            array(
+                3,4
+            ),
+        );
+        $expected->children = array($childResult);
+
+        $this->assertEquals($expected, $result);
+    }
+
     public function testBuildRepresentationSimple()
     {
         $parent  = new Adult('first', 'last', 20, 'public');
@@ -25,6 +71,7 @@ class GenericRepresentationBuilderTest extends RepresentTestCase
         $expected->age        = 20;
         $expected->publicTest = 'public';
         $expected->children   = array();
+        $expected->_hash      = 0;
 
         $this->assertEquals($expected, $result);
     }
@@ -41,13 +88,16 @@ class GenericRepresentationBuilderTest extends RepresentTestCase
         $childResult->firstName = 'first';
         $childResult->lastName  = 'last';
         $childResult->toys      = array();
+        $childResult->_hash     = 1;
+        $childResult->parent    = null;
 
-        $expected = new \stdClass();
-        $expected->firstName = 'first';
-        $expected->lastName  = 'last';
-        $expected->age =        20;
+        $expected             = new \stdClass();
+        $expected->firstName  = 'first';
+        $expected->lastName   = 'last';
+        $expected->age        =        20;
         $expected->publicTest = 'public';
-        $expected->children  = array ($childResult);
+        $expected->children   = array ($childResult);
+        $expected->_hash      = 0;
 
         $this->assertEquals($expected, $result);
     }
@@ -64,8 +114,11 @@ class GenericRepresentationBuilderTest extends RepresentTestCase
         $childResult->firstName = 'first';
         $childResult->lastName  = 'last';
         $childResult->toys      = array();
+        $childResult->_hash     = 1;
+        $childResult->parent    = null;
 
         $expected = new \stdClass();
+        $expected->_hash = 0;
         $expected->firstName = 'first';
         $expected->lastName  = 'last';
         $expected->age       = 20;
@@ -96,13 +149,17 @@ class GenericRepresentationBuilderTest extends RepresentTestCase
         $toyResult->color = 'red';
         $toyResult->name  = 'joe';
         $toyResult->sound = 'vhroom';
+        $toyResult->_hash = 2;
 
         $childResult = new \stdClass();
         $childResult->firstName = 'first';
         $childResult->lastName = 'last';
         $childResult->toys = array($toyResult);
+        $childResult->_hash = 1;
+        $childResult->parent = null;
 
         $expected = new \stdClass();
+        $expected->_hash = 0;
         $expected->firstName = 'first';
         $expected->lastName  = 'last';
         $expected->age       = 20;
@@ -129,8 +186,10 @@ class GenericRepresentationBuilderTest extends RepresentTestCase
         $objectResult->color = 'red';
         $objectResult->name  = 'car';
         $objectResult->sound = 'vhroom';
+        $objectResult->_hash = 1;
 
         $expected             = new \stdClass();
+        $expected->_hash      = 0;
         $expected->firstName  = 'first';
         $expected->lastName   = 'last';
         $expected->publicTest = $objectResult;
@@ -154,9 +213,13 @@ class GenericRepresentationBuilderTest extends RepresentTestCase
         $parentResult->publicTest = 'public';
         $parentResult->children   = array();
 
+        $parentResult2 = clone($parentResult);
+        $parentResult2->_hash = 1;
+        $parentResult->_hash  = 0;
+
         $expected = array(
             $parentResult,
-            $parentResult
+            $parentResult2
         );
 
         $this->assertEquals($expected, $result);
@@ -164,9 +227,9 @@ class GenericRepresentationBuilderTest extends RepresentTestCase
 
     public function testBuildRepresentationWithSimpleArray()
     {
-        $test = array(1,2,3);
+        $test    = array(1,2,3);
         $builder =  $this->getGenericRepresentationBuilder();
-        $result = $builder->buildRepresentation($test);
+        $result  = $builder->buildRepresentation($test);
 
         $this->assertEquals($test, $result);
     }
@@ -192,13 +255,17 @@ class GenericRepresentationBuilderTest extends RepresentTestCase
         $toyResult->color = 'red';
         $toyResult->name  = 'joe';
         $toyResult->sound = 'vhroom';
+        $toyResult->_hash = 2;
 
         $childResult = new \stdClass();
         $childResult->firstName = 'first';
         $childResult->lastName = 'last';
         $childResult->toys = array($toyResult);
+        $childResult->_hash = 1;
+        $childResult->parent = null;
 
         $parentResult = new \stdClass();
+        $parentResult->_hash = 0;
         $parentResult->children  = array($childResult);
         $parentResult->firstName = 'first';
         $parentResult->lastName  = 'last';
@@ -228,6 +295,7 @@ class GenericRepresentationBuilderTest extends RepresentTestCase
         $expected->age        = null;
         $expected->publicTest = null;
         $expected->children   = array();
+        $expected->_hash      = 0;
 
         $this->assertEquals($expected, $result);
     }

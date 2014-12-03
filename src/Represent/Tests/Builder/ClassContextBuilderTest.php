@@ -25,9 +25,9 @@ class ClassContextBuilderTest extends RepresentTestCase
         $reader->shouldReceive('getPropertyAnnotation')->with($property, '\Represent\Annotations\View')->andReturn($view);
 
         $builder = new ClassContextBuilder($reader);
-        $result  = $builder->buildClassContext($class, $viewName);
+        $result  = $builder->buildClassContext($class, 0, $viewName);
 
-        $this->assertEquals(array($property), $result->properties);
+        $this->assertTrue(array($property) === $result->properties);
     }
 
 
@@ -45,7 +45,7 @@ class ClassContextBuilderTest extends RepresentTestCase
         $reader->shouldReceive('getPropertyAnnotation')->with($property, '\Represent\Annotations\View')->andReturnNull();
 
         $builder = new ClassContextBuilder($reader);
-        $result  = $builder->buildClassContext($class);
+        $result  = $builder->buildClassContext($class, 0);
 
         $this->assertInstanceOf('Represent\Context\ClassContext', $result);
         $this->assertEquals(array($property), $result->properties);
@@ -196,14 +196,14 @@ class ClassContextBuilderTest extends RepresentTestCase
         $viewName = 'test';
 
         $context->properties = array($property);
-        $context->view       = $viewName;
+        $context->views       = $viewName;
         $view->name          = array($viewName);
         $reader->shouldReceive('getPropertyAnnotation')->with($property, '\Represent\Annotations\View')->andReturn($view);
 
         $builder = new ClassContextBuilder($reader);
         $result  = $this->getReflectedMethod($builder, 'handleView')->invoke($builder, $context);
 
-        $this->assertEquals(array($property), $result->properties);
+        $this->assertTrue(array($property) === $result->properties);
     }
 
     public function testHandleViewFalse()

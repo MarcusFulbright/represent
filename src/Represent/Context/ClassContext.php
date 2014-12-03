@@ -12,4 +12,6 @@ class ClassContext
     public $properties = array();
 
     public $views = array();
+
+    public $hash;
 }

@@ -3,6 +3,7 @@
 namespace Represent\Test\Fixtures;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Represent\Test\Fixtures\Adult;
 
 class Child
 {
@@ -12,11 +13,14 @@ class Child
 
     private $toys;
 
-    public function __construct($firstName, $lastName)
+    private $parent;
+
+    public function __construct($firstName, $lastName, Adult $parent = null)
     {
         $this->firstName = $firstName;
         $this->lastName  = $lastName;
         $this->toys      = new ArrayCollection();
+        $this->parent    = $parent;
     }
 
     /**

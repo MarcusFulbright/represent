@@ -27,17 +27,18 @@ class ClassContextBuilder
     /**
      * Entry point to build the class context object. Currently only knows how to handle exclusion policy.
      * Any new top level class annotations need a handler in here.
-     *
      * @param \ReflectionClass $reflection
+     * @param                  $hash
      * @param                  $view
      * @return ClassContext
      */
-    public function buildClassContext(\ReflectionClass $reflection, $view = null)
+    public function buildClassContext(\ReflectionClass $reflection, $hash, $view = null)
     {
         $classContext = new ClassContext();
+        $classContext->hash = $hash;
         $classContext = $this->handleExclusionPolicy($reflection, $classContext);
 
-        $classContext->view = $view;
+        $classContext->views = $view;
         $classContext = $this->handleView($classContext);
 
         return $classContext;
@@ -127,7 +128,7 @@ class ClassContextBuilder
             function ($property) use ($reader, $classContext) {
                 $annotation = $reader->getPropertyAnnotation($property,'\Represent\Annotations\View');
 
-                return $annotation == null || in_array($classContext->view, $annotation->name);
+                return $annotation == null || in_array($classContext->views, $annotation->name);
             }
         );
 
