@@ -7,9 +7,6 @@ use Represent\Generator\LinkGenerator;
 use Represent\Serializer\HalSerializer;
 use Represent\Test\RepresentTestCase;
 use Doctrine\Common\Annotations\AnnotationReader;
-use Represent\Builder\ClassContextBuilder;
-use Represent\Builder\GenericRepresentationBuilder;
-use Represent\Builder\PropertyContextBuilder;
 use Represent\Test\Fixtures\Annotated\Adult;
 use Represent\Test\Fixtures\Annotated\Child;
 use Represent\Test\Fixtures\Annotated\Toy;
@@ -27,9 +24,8 @@ class HalSerializerTest extends RepresentTestCase
         $parent->addChild($child);
 
         $urlGenerator      = $this->getUrlGeneratorMock();
-        $reader            = new AnnotationReader();
-        $genericBuilder    = new GenericRepresentationBuilder(new PropertyContextBuilder($reader), new ClassContextBuilder($reader));
-        $halBuilder        = new HalFormatBuilder($reader, new LinkGenerator($urlGenerator, new ExpressionLanguage()));
+        $genericBuilder    = $this->getGenericRepresentationBuilder();
+        $halBuilder        = new HalFormatBuilder(new AnnotationReader(), new LinkGenerator($urlGenerator, new ExpressionLanguage()));
         $serializer        = new HalSerializer($halBuilder, $genericBuilder);
 
         $urlGenerator->shouldReceive('generate')->andReturn("www.example.com/selfLink");

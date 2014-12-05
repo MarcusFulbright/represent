@@ -3,6 +3,7 @@
 namespace Represent\Builder;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\ORM\EntityManager;
 use MyProject\Proxies\__CG__\stdClass;
 use Represent\Builder\ClassContextBuilder;
 use Represent\Context\ClassContext;
@@ -29,10 +30,16 @@ class GenericRepresentationBuilder
      */
     private $visited = array();
 
-    public function __construct(PropertyContextBuilder $propertyBuilder, ClassContextBuilder $classBuilder)
+    /**
+     * @var EntityManager
+     */
+    private $em;
+
+    public function __construct(PropertyContextBuilder $propertyBuilder, ClassContextBuilder $classBuilder, EntityManager $em)
     {
         $this->propertyBuilder = $propertyBuilder;
         $this->classBuilder    = $classBuilder;
+        $this->em              = $em;
     }
 
     /**
@@ -46,6 +53,8 @@ class GenericRepresentationBuilder
      */
     public function buildRepresentation($object, $view = null)
     {
+        $this->em->initializeObject($object);
+
         switch (true):
             case $this->checkArrayCollection($object):
                 $object = $object->toArray();
@@ -82,6 +91,8 @@ class GenericRepresentationBuilder
      */
     private function handleObject($object, $view)
     {
+        $this->em->initializeObject($object);
+
         $hash   = spl_object_hash($object);
         $check  = array_search($hash, $this->visited);
         $output = new \stdClass();
@@ -118,10 +129,9 @@ class GenericRepresentationBuilder
         $propertyContext = $this->propertyBuilder->propertyContextFromReflection($property, $original, $classContext);
         $value    = $propertyContext->value;
         $name     = $propertyContext->name;
-
         switch (true):
             case $this->checkArrayCollection($value):
-                $value = $value->toArray();
+                 $value = $value->toArray();
             case is_array($value);
                 $output->$name = $this->handleArray($value, $classContext->views);
                 break;
@@ -144,9 +154,7 @@ class GenericRepresentationBuilder
      */
     private function checkArrayCollection($object)
     {
-        $class = 'Doctrine\Common\Collections\ArrayCollection';
-
-        return $object instanceof $class;
+        return $object instanceof \Doctrine\Common\Collections\ArrayCollection || $object instanceof \Doctrine\ORM\PersistentCollection;
     }
 
     /**

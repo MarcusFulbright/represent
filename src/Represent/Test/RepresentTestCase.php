@@ -2,6 +2,11 @@
 
 namespace Represent\Test;
 
+use Doctrine\Common\Annotations\AnnotationReader;
+use Represent\Builder\ClassContextBuilder;
+use Represent\Builder\GenericRepresentationBuilder;
+use Represent\Builder\PropertyContextBuilder;
+
 class RepresentTestCase extends \PHPUnit_Framework_TestCase
 {
     protected function getBasicReflectionClassMock()
@@ -97,6 +102,38 @@ class RepresentTestCase extends \PHPUnit_Framework_TestCase
     protected function getPaginationFactoryMock()
     {
         return \Mockery::mock('Represent\Factory\PaginationFactory');
+    }
+
+    protected function getEntityManagerMock()
+    {
+        return \Mockery::mock('Doctrine\ORM\EntityManager');
+    }
+
+    protected function getDoctrineConnectionMock()
+    {
+        return \Mockery::mock('Doctrine\DBAL\Connection');
+    }
+
+    protected function getConfigurationMocK()
+    {
+        return \Mockery::mock('Doctrine\ORM\Configuration');
+    }
+
+    protected function getEventManagerMock()
+    {
+        return \Mockery::mock('Doctrine\Common\EventManager');
+    }
+
+    protected  function getGenericRepresentationBuilder()
+    {
+        $reader = new AnnotationReader();
+
+        $em = $this->getEntityManagerMock();
+        $em->shouldReceive('initializeObject')->withAnyArgs()->andReturnUsing(function($object) {
+                return $object;
+            });
+
+        return new GenericRepresentationBuilder(new PropertyContextBuilder($reader), new ClassContextBuilder($reader), $em);
     }
 
     /**

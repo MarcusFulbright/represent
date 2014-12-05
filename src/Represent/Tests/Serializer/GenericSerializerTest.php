@@ -3,9 +3,6 @@
 namespace Represent\Tests\Serializer;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use Represent\Builder\ClassContextBuilder;
-use Represent\Builder\GenericRepresentationBuilder;
-use Represent\Builder\PropertyContextBuilder;
 use Represent\Serializer\GenericSerializer;
 use Represent\Test\RepresentTestCase;
 use Represent\Test\Fixtures\Annotated\Adult;
@@ -22,8 +19,7 @@ class GenericSerializerTest extends RepresentTestCase
         $parent = new Adult('Ichabod', 'Crane', '40', 'invisible');
         $parent->addChild($child);
 
-        $reader     = new AnnotationReader();
-        $builder    = new GenericRepresentationBuilder(new PropertyContextBuilder($reader), new ClassContextBuilder($reader));
+        $builder    = $this->getGenericRepresentationBuilder();
         $serializer = new GenericSerializer($builder);
 
         $result = $serializer->serialize($parent, 'json');
@@ -40,8 +36,7 @@ class GenericSerializerTest extends RepresentTestCase
         $parent = new Adult('Ichabod', 'Crane', '40', 'invisible');
         $parent->addChild($child);
 
-        $reader     = new AnnotationReader();
-        $builder    = new GenericRepresentationBuilder(new PropertyContextBuilder($reader), new ClassContextBuilder($reader));
+        $builder    = $this->getGenericRepresentationBuilder();
         $serializer = new GenericSerializer($builder);
 
         $result = $serializer->serialize($parent, 'json', 'private');

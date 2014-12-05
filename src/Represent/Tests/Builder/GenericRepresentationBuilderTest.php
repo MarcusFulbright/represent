@@ -3,13 +3,10 @@
 namespace Represent\Tests\Builder;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use Represent\Builder\GenericRepresentationBuilder;
-use Represent\Builder\PropertyContextBuilder;
 use Represent\Test\RepresentTestCase;
 use Represent\Test\Fixtures\Adult;
 use Represent\Test\Fixtures\Child;
 use Represent\Test\Fixtures\Toy;
-use Represent\Builder\ClassContextBuilder;
 
 class GenericRepresentationBuilderTest extends RepresentTestCase
 {
@@ -325,12 +322,5 @@ class GenericRepresentationBuilderTest extends RepresentTestCase
         $result  = $builder->buildRepresentation($test);
 
         $this->assertEquals($test, $result);
-    }
-
-    private function getGenericRepresentationBuilder()
-    {
-        $reader = new AnnotationReader();
-
-        return new GenericRepresentationBuilder(new PropertyContextBuilder($reader), new ClassContextBuilder($reader));
     }
 }
