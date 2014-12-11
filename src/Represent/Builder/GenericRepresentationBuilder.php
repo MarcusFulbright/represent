@@ -18,28 +18,22 @@ class GenericRepresentationBuilder
     /**
      * @var \Represent\Builder\PropertyContextBuilder
      */
-    private $propertyBuilder;
+    protected $propertyBuilder;
 
     /**
      * @var ClassContextBuilder
      */
-    private $classBuilder;
+    protected $classBuilder;
 
     /**
      * @var array
      */
-    private $visited = array();
+    protected $visited = array();
 
-    /**
-     * @var EntityManager
-     */
-    private $em;
-
-    public function __construct(PropertyContextBuilder $propertyBuilder, ClassContextBuilder $classBuilder, EntityManager $em)
+    public function __construct(PropertyContextBuilder $propertyBuilder, ClassContextBuilder $classBuilder)
     {
         $this->propertyBuilder = $propertyBuilder;
         $this->classBuilder    = $classBuilder;
-        $this->em              = $em;
     }
 
     /**
@@ -53,8 +47,6 @@ class GenericRepresentationBuilder
      */
     public function buildRepresentation($object, $view = null)
     {
-        $this->em->initializeObject($object);
-
         switch (true):
             case $this->checkArrayCollection($object):
                 $object = $object->toArray();
@@ -65,7 +57,7 @@ class GenericRepresentationBuilder
                 $output = $this->handleObject($object, $view);
                 break;
             case is_null($object):
-                $output = array();
+                $output = null;
                 break;
             case is_string($object):
                 $output = $object;
@@ -89,10 +81,8 @@ class GenericRepresentationBuilder
      * @param $view
      * @return \stdClass
      */
-    private function handleObject($object, $view)
+    protected function handleObject($object, $view)
     {
-        $this->em->initializeObject($object);
-
         $hash   = spl_object_hash($object);
         $check  = array_search($hash, $this->visited);
         $output = new \stdClass();
@@ -124,11 +114,11 @@ class GenericRepresentationBuilder
      * @param \Represent\Context\ClassContext $classContext
      * @return stdClass
      */
-    private function handleProperty(\ReflectionProperty $property, $original, $output, ClassContext $classContext)
+    protected function handleProperty(\ReflectionProperty $property, $original, $output, ClassContext $classContext)
     {
         $propertyContext = $this->propertyBuilder->propertyContextFromReflection($property, $original, $classContext);
-        $value    = $propertyContext->value;
-        $name     = $propertyContext->name;
+        $value           = $propertyContext->value;
+        $name            = $propertyContext->name;
         switch (true):
             case $this->checkArrayCollection($value):
                  $value = $value->toArray();
@@ -152,7 +142,7 @@ class GenericRepresentationBuilder
      * @param $object
      * @return bool
      */
-    private function checkArrayCollection($object)
+    protected function checkArrayCollection($object)
     {
         return $object instanceof \Doctrine\Common\Collections\ArrayCollection || $object instanceof \Doctrine\ORM\PersistentCollection;
     }
@@ -164,7 +154,7 @@ class GenericRepresentationBuilder
      * @param string $view
      * @return array
      */
-    private function handleArray(array $object, $view)
+    protected function handleArray(array $object, $view)
     {
         $output = array();
         foreach ($object as $key => $value) {
