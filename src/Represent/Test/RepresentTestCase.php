@@ -29,6 +29,16 @@ class RepresentTestCase extends \PHPUnit_Framework_TestCase
         return \Mockery::mock('\ReflectionProperty');
     }
 
+    protected function getBasicReflectionMethodMock()
+    {
+        return \Mockery::mock('\ReflectionMethod');
+    }
+
+    protected function getBasicReflectionParamMock()
+    {
+        return \Mockery::mock('\ReflectionParameter');
+    }
+
     protected function getHideMock()
     {
         return \Mockery::mock('Represent\Annotations\Hide');
@@ -134,6 +144,16 @@ class RepresentTestCase extends \PHPUnit_Framework_TestCase
             });
 
         return new GenericRepresentationBuilder(new PropertyContextBuilder($reader), new ClassContextBuilder($reader), $em);
+    }
+
+    protected function getGenericInstantiatorMock()
+    {
+        return \Mockery::mock('Represent\Instantiator\GenericInstantiator');
+    }
+
+    protected function getDoctrineClassMetaMock()
+    {
+        return \Mockery::mock('Doctrine\ORM\Mapping\ClassMetadata');
     }
 
     /**

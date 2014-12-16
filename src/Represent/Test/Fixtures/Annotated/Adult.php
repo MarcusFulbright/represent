@@ -3,6 +3,7 @@
 namespace Represent\Test\Fixtures\Annotated;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Mapping as ORM;
 use Represent\Annotations as Represent;
 
 /**
