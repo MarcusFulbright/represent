@@ -68,6 +68,10 @@ class DoctrineDeserializer
             $property = $reflection->getProperty($association);
             $property->setAccessible(true);
 
+            if (!property_exists($data, $association)) {
+                continue;
+            }
+
             switch (true):
                 case $meta->isSingleValuedAssociation($association):
                     $value = $this->fromStdObject($data->$association, $mapping['targetEntity']);
@@ -98,8 +102,13 @@ class DoctrineDeserializer
     {
         foreach ($fields as $field) {
             $property = $reflection->getProperty($field);
+            $name     = $property->getName();
+
+            if (property_exists($data, $name) === false ) {
+                continue;
+            }
+
             $property->setAccessible(true);
-            $name = $property->getName();
             $property->setValue($object, $data->$name);
         }
     }
