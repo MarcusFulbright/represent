@@ -5,25 +5,59 @@ namespace Represent\Serializer;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Represent\Handler\PropertyHandler;
 use Represent\Instantiator\GenericInstantiator;
 use Represent\Instantiator\InstantiatorInterface;
 
 class DoctrineDeserializer
 {
+    /**
+     * @var \Represent\Instantiator\GenericInstantiator
+     */
     private $genericInstantiator;
 
+    /**
+     * @var \Represent\Instantiator\InstantiatorInterface
+     */
     private $customInstantiator;
 
+    /**
+     * @var \Doctrine\ORM\EntityManager
+     */
+    private $em;
+
+    /**
+     * @var \Represent\Handler\PropertyHandler
+     */
+    private $propertyHandler;
+
+    /**
+     * @param InstantiatorInterface $customInstantiator
+     * @param GenericInstantiator $genericInstantiator
+     * @param EntityManager $em
+     * @param PropertyHandler $propertyHandler
+     */
     public function __construct(
         InstantiatorInterface $customInstantiator = null,
         GenericInstantiator $genericInstantiator,
-        EntityManager $em)
+        EntityManager $em,
+        PropertyHandler $propertyHandler)
     {
         $this->customInstantiator  = $customInstantiator;
         $this->genericInstantiator = $genericInstantiator;
+        $this->propertyHandler     = $propertyHandler;
         $this->em                  = $em;
     }
 
+    /**
+     * Entry point to De-Serialize a supported format into a class
+     *
+     * @param $data
+     * @param $class
+     * @param $format
+     * @return object
+     * @throws \Exception
+     */
     public function deSerialize($data, $class, $format)
     {
         switch ($format):
@@ -34,6 +68,13 @@ class DoctrineDeserializer
         endswitch;
     }
 
+    /**
+     * Handles json
+     *
+     * @param $data
+     * @param $class
+     * @return object
+     */
     private function handleJson($data, $class)
     {
         $data   = json_decode($data);
@@ -42,6 +83,13 @@ class DoctrineDeserializer
         return $output;
     }
 
+    /**
+     * Converts a stdClass representation of data into a class
+     *
+     * @param \stdClass $data
+     * @param $class
+     * @return object
+     */
     private function fromStdObject(\stdClass $data, $class)
     {
         $reflection   = $this->getReflection($class);
@@ -54,6 +102,8 @@ class DoctrineDeserializer
     }
 
     /**
+     * Handles associations
+     *
      * @param                                         $data
      * @param                                         $object
      * @param \ReflectionClass                        $reflection
@@ -92,7 +142,8 @@ class DoctrineDeserializer
     }
 
     /**
-     * @todo make sure that this respects the type
+     * Handles properties
+     *
      * @param                  $data
      * @param                  $object
      * @param \ReflectionClass $reflection
@@ -107,12 +158,20 @@ class DoctrineDeserializer
             if (property_exists($data, $name) === false ) {
                 continue;
             }
-
             $property->setAccessible(true);
-            $property->setValue($object, $data->$name);
+            $type  = $this->propertyHandler->propertyTypeOverride(null, $property);
+            $value = $this->propertyHandler->handleTypeConversion($type, $data->$name);
+
+            $property->setValue($object, $value);
         }
     }
 
+    /**
+     * builds a property map for doctrine entities
+     *
+     * @param $class
+     * @return mixed
+     */
     private function getPropertyMap($class)
     {
         $output['meta'] = $meta = $this->em->getClassMetadata($class);
@@ -133,6 +192,14 @@ class DoctrineDeserializer
         return $output;
     }
 
+    /**
+     * Instantiates a class from a reflection. uses $data to navigate constructors
+     *
+     * @param \stdClass $data
+     * @param \ReflectionClass $reflection
+     * @return object
+     * @throws \Exception
+     */
     private function getClassInstance(\stdClass $data, \ReflectionClass $reflection)
     {
         switch (true):
@@ -149,6 +216,13 @@ class DoctrineDeserializer
         return $output;
     }
 
+    /**
+     * Get a reflection for $class
+     *
+     * @param $class
+     * @return \ReflectionClass
+     * @throws \Exception
+     */
     private function getReflection($class)
     {
         $reflection = new \ReflectionClass($class);

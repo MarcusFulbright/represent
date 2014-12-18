@@ -4,6 +4,7 @@ namespace Represent\Tests\Serializer;
 
 use Represent\Instantiator\GenericInstantiator;
 use Represent\Serializer\Deserializer;
+use Represent\Serializer\DoctrineDeserializer;
 use Represent\Test\RepresentTestCase;
 
 class DeserializerTest extends RepresentTestCase
@@ -70,7 +71,16 @@ class DeserializerTest extends RepresentTestCase
         $em = $this->getEntityManagerMock();
         $em->shouldReceive('getClassMetadata')->andReturn($metaData);
 
-        $deSerializer = new Deserializer(null, new GenericInstantiator(), $em);
+        $handler = $this->getPropertyHandlerMock();
+        $handler->shouldReceive('propertyTypeOverride')->andReturnNull();
+        $handler->shouldReceive('handleTypeConversion')->andReturnUsing(
+            function($type, $value) {
+                return $value;
+            }
+        );
+
+
+        $deSerializer = new DoctrineDeserializer(null, new GenericInstantiator(), $em, $handler);
         $result = $this->getReflectedMethod($deSerializer, 'fromStdObject')->invoke($deSerializer, $data, $this->adultClass);
 
         $this->assertInstanceOf($this->adultClass, $result);

@@ -6,6 +6,7 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Represent\Builder\ClassContextBuilder;
 use Represent\Builder\GenericRepresentationBuilder;
 use Represent\Builder\PropertyContextBuilder;
+use Represent\Handler\PropertyHandler;
 
 class RepresentTestCase extends \PHPUnit_Framework_TestCase
 {
@@ -143,7 +144,7 @@ class RepresentTestCase extends \PHPUnit_Framework_TestCase
                 return $object;
             });
 
-        return new GenericRepresentationBuilder(new PropertyContextBuilder($reader), new ClassContextBuilder($reader), $em);
+        return new GenericRepresentationBuilder(new PropertyContextBuilder(new PropertyHandler($reader)), new ClassContextBuilder($reader), $em);
     }
 
     protected function getGenericInstantiatorMock()
@@ -154,6 +155,11 @@ class RepresentTestCase extends \PHPUnit_Framework_TestCase
     protected function getDoctrineClassMetaMock()
     {
         return \Mockery::mock('Doctrine\ORM\Mapping\ClassMetadata');
+    }
+
+    protected function getPropertyHandlerMock()
+    {
+        return \Mockery::mock('Represent\Handler\PropertyHandler');
     }
 
     /**

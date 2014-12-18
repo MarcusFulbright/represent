@@ -2,21 +2,20 @@
 
 namespace Represent\Builder;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use Represent\Annotations\Property;
-use Represent\Enum\PropertyTypeEnum;
 use Represent\Context\PropertyContext;
+use Represent\Handler\PropertyHandler;
 
 /**
  * Responsible for building representations of class properties
  */
 class PropertyContextBuilder
 {
-    private $annotationReader;
+    private $propertyHandler;
 
-    public function __construct(AnnotationReader $annotationReader)
+    public function __construct(PropertyHandler $propertyhandler)
     {
-        $this->annotationReader = $annotationReader;
+        $this->propertyHandler = $propertyhandler;
     }
 
     /**
@@ -44,7 +43,7 @@ class PropertyContextBuilder
      */
     private function parseAnnotations(PropertyContext $context, \ReflectionProperty $property, $original)
     {
-        $annot = $this->annotationReader->getPropertyAnnotation($property, '\Represent\Annotations\Property');
+        $annot = $this->propertyHandler->getPropertyAnnotation($property);
 
         if ($annot) {
             $context = $this->handleRepresentProperty($property, $annot, $context, $original);
@@ -68,35 +67,9 @@ class PropertyContextBuilder
         }
 
         if ($annot->getType()) {
-            $context->value = $this->handleTypeConversion($annot->getType(), $property->getValue($original));
+            $context->value = $this->propertyHandler->handleTypeConversion($annot->getType(), $property->getValue($original));
         }
 
         return $context;
-    }
-
-    /**
-     * Handles dealing with type conversion for the Represent\Property annotation
-     * @param $type
-     * @param $value
-     * @return bool|\DateTime|int|string
-     */
-    private function handleTypeConversion($type, $value)
-    {
-        switch ($type):
-            case PropertyTypeEnum::STRING:
-                $value = (string) $value;
-                break;
-            case PropertyTypeEnum::BOOLEAN:
-                $value = (boolean) $value;
-                break;
-            case PropertyTypeEnum::INTEGER:
-                $value = (integer) $value;
-                break;
-            case PropertyTypeEnum::DATETIME;
-                $value = new \DateTime($value);
-                break;
-        endswitch;
-
-        return $value;
     }
 }
