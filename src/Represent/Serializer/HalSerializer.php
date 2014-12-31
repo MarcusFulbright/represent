@@ -3,6 +3,7 @@
 namespace Represent\Serializer;
 
 use Represent\Builder\Format\FormatBuilderInterface;
+use Represent\Builder\Format\HalFormatBuilder;
 use Represent\Builder\GenericRepresentationBuilder;
 
 class HalSerializer implements RepresentSerializerInterface
@@ -22,9 +23,8 @@ class HalSerializer implements RepresentSerializerInterface
      */
     private $formatMap = array('hal+json' => 'toJson');
 
-    public function __construct(FormatBuilderInterface $formatBuilder, GenericRepresentationBuilder $genericBuilder)
+    public function __construct(HalFormatBuilder $formatBuilder)
     {
-        $this->genericBuilder = $genericBuilder;
         $this->formatBuilder  = $formatBuilder;
     }
 
@@ -52,12 +52,10 @@ class HalSerializer implements RepresentSerializerInterface
      */
     private function toJson($object, $view = null)
     {
-        $representation = $this->genericBuilder->buildRepresentation($object, $view);
-
         return str_replace(
             "\/",
             "/",
-            json_encode($this->formatBuilder->buildRepresentation($representation, $object, $view))
+            json_encode($this->formatBuilder->buildRepresentation($object, $view))
         );
     }
 }

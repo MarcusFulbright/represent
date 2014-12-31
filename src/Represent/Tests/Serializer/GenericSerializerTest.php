@@ -23,7 +23,7 @@ class GenericSerializerTest extends RepresentTestCase
         $serializer = new GenericSerializer($builder);
 
         $result = $serializer->serialize($parent, 'json');
-        $expected = '{"_hash":0,"First Name":"Ichabod","Last Name":"Crane","children":[{"_hash":1,"First Name":"Henry","Last Name":"Parish","toys":[{"_hash":2,"color":"brown","name":"Golem","sound":"smash"}]}]}';
+        $expected = '{"_hash":1,"First Name":"Ichabod","Last Name":"Crane","children":[{"_hash":2,"First Name":"Henry","Last Name":"Parish","toys":[{"_hash":3,"color":"brown","name":"Golem","sound":"smash"}]}]}';
 
         $this->assertEquals($expected, $result);
     }
@@ -40,7 +40,7 @@ class GenericSerializerTest extends RepresentTestCase
         $serializer = new GenericSerializer($builder);
 
         $result = $serializer->serialize($parent, 'json', 'private');
-        $expected = '{"_hash":0,"First Name":"Ichabod","Last Name":"Crane","age":40,"children":[{"_hash":1,"First Name":"Henry","Last Name":"Parish","toys":[{"_hash":2,"color":"brown","name":"Golem","sound":"smash"}]}]}';
+        $expected = '{"_hash":1,"First Name":"Ichabod","Last Name":"Crane","age":40,"children":[{"_hash":2,"First Name":"Henry","Last Name":"Parish","toys":[{"_hash":3,"color":"brown","name":"Golem","sound":"smash"}]}]}';
 
         $this->assertEquals($expected, $result);
     }

@@ -139,12 +139,7 @@ class RepresentTestCase extends \PHPUnit_Framework_TestCase
     {
         $reader = new AnnotationReader();
 
-        $em = $this->getEntityManagerMock();
-        $em->shouldReceive('initializeObject')->withAnyArgs()->andReturnUsing(function($object) {
-                return $object;
-            });
-
-        return new GenericRepresentationBuilder(new PropertyContextBuilder(new PropertyHandler($reader)), new ClassContextBuilder($reader), $em);
+        return new GenericRepresentationBuilder(new PropertyContextBuilder(new PropertyHandler($reader)), new ClassContextBuilder($reader));
     }
 
     protected function getGenericInstantiatorMock()
@@ -160,6 +155,16 @@ class RepresentTestCase extends \PHPUnit_Framework_TestCase
     protected function getPropertyHandlerMock()
     {
         return \Mockery::mock('Represent\Handler\PropertyHandler');
+    }
+
+    protected function getPropertyBuilderMock()
+    {
+        return \Mockery::mock('Represent\Builder\PropertyContextBuilder');
+    }
+
+    protected function getClassBuilderMock()
+    {
+        return \Mockery::mock('Represent\Builder\ClassContextBuilder');
     }
 
     /**

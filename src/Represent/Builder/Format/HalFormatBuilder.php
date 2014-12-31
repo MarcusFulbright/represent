@@ -2,11 +2,15 @@
 
 namespace Represent\Builder\Format;
 
-use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\Common\Annotations\AnnotationReader as reader;
 use Represent\Annotations\LinkCollection;
-use Represent\Generator\LinkGenerator;
+use Represent\Builder\AbstractBuilder;
+use Represent\Builder\ClassContextBuilder;
+use Represent\Builder\PropertyContextBuilder;
+use Represent\Context\ClassContext;
+use Represent\Generator\LinkGenerator as generator;
 
-class HalFormatBuilder implements  FormatBuilderInterface
+class HalFormatBuilder extends AbstractBuilder
 {
     /**
      * @var \Doctrine\Common\Annotations\AnnotationReader
@@ -19,28 +23,110 @@ class HalFormatBuilder implements  FormatBuilderInterface
     private $linkGenerator;
 
     /**
-     * @param AnnotationReader $reader
-     * @param LinkGenerator    $linkGenerator
+     * {@inheritdoc}
      */
-    public function __construct(AnnotationReader $reader, LinkGenerator $linkGenerator)
+    public function __construct(PropertyContextBuilder $propertyBuilder, ClassContextBuilder $classBuilder, array $config = array())
     {
-        $this->reader        = $reader;
-        $this->linkGenerator = $linkGenerator;
+        $this->propertyBuilder = $propertyBuilder;
+        $this->classBuilder    = $classBuilder;
+
+        if (!array_key_exists('reader', $config) || !$config['reader'] instanceof reader) {
+            throw new \Exception('HalFormatBuilder must have a doctrine annotation reader');
+        }
+
+        if (!array_key_exists('linkGenerator', $config) || !$config['linkGenerator'] instanceof generator) {
+            throw new \Exception('HalFormatBuilder must have a link generator');
+        }
+
+        $this->reader        = $config['reader'];
+        $this->linkGenerator = $config['linkGenerator'];
     }
 
     /**
-     * Adds the _embedded and _links property to a generic representation
-     * @param      $representation
-     * @param      $object
-     * @param null $view
-     * @return mixed
+     * Used to handle representing objects
+     * @param $object
+     * @param $view
+     * @return \stdClass
      */
-    public function buildRepresentation($representation, $object, $view = null)
+    protected function handleObject($object, $view)
     {
-        $representation->_embedded = $this->getEmbedded($representation, new \ReflectionClass($object));
-        $representation->_links    = $this->getLinks(new \ReflectionClass($object), $view);
+        $check = $this->trackObjectVisits($object);
 
-        return $representation;
+        if ($check instanceof \stdClass){
+
+            return $check;
+        } else {
+            $output = new \stdClass();
+            $output->_hash = $check;
+        }
+
+        $reflection      = new \ReflectionClass($object);
+        $classContext    = $this->classBuilder->buildClassContext($reflection, $check, $view);
+
+        foreach ($classContext->properties as $property) {
+            $output = $this->handleProperty($property, $classContext, $object, $output);
+        }
+
+        $output->_embedded = $this->getEmbedded($output, new \ReflectionClass($object));
+        $output->_links    = $this->getLinks(new \ReflectionClass($object), $view);
+
+        return $output;
+    }
+
+    /**
+     * Used to handle determining representing object properties
+     * @param \ReflectionProperty             $property
+     * @param                                 $original
+     * @param                                 $output
+     * @param \Represent\Context\ClassContext $classContext
+     * @return stdClass
+     */
+    protected function handleProperty(\ReflectionProperty $property, ClassContext $classContext, $original, \stdClass $output)
+    {
+        $propertyContext = $this->propertyBuilder->propertyContextFromReflection($property, $original, $classContext);
+        $value           = $propertyContext->value;
+        $name            = $propertyContext->name;
+        switch (true):
+            case $this->checkArrayCollection($value):
+                $value = $value->toArray();
+            case is_array($value);
+                $output->$name = $this->handleArray($value, $classContext->views);
+                break;
+            case is_object($value);
+                $output->$name = $this->handleObject($value, $classContext->views);
+                break;
+            default:
+                $output->$name = $value;
+                break;
+        endswitch;
+
+        return $output;
+    }
+
+    /**
+     * Can handle representing an array
+     *
+     * @param array $object
+     * @param string $view
+     * @return array
+     */
+    protected function handleArray(array $object, $view)
+    {
+        $output = array();
+        foreach ($object as $key => $value) {
+            switch (true):;
+                case is_array($value):
+                    $output[$key] = $this->handleArray($value, $view);
+                    break;
+                case is_object($value):
+                    $output[$key] = $this->handleObject($value, $view);
+                    break;
+                default:
+                    $output[$key] = $value;
+            endswitch;
+        }
+
+        return $output;
     }
 
     /**

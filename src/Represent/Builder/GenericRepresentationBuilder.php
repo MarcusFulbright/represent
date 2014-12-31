@@ -13,7 +13,7 @@ use Represent\Context\ClassContext;
  *
  * @author Marcus Fulbright <fulbright.marcus@gmail.com>
  */
-class GenericRepresentationBuilder
+class GenericRepresentationBuilder extends AbstractBuilder
 {
     /**
      * @var \Represent\Builder\PropertyContextBuilder
@@ -30,49 +30,10 @@ class GenericRepresentationBuilder
      */
     protected $visited = array();
 
-    public function __construct(PropertyContextBuilder $propertyBuilder, ClassContextBuilder $classBuilder)
+    public function __construct(PropertyContextBuilder $propertyBuilder, ClassContextBuilder $classBuilder, array $config = array())
     {
         $this->propertyBuilder = $propertyBuilder;
         $this->classBuilder    = $classBuilder;
-    }
-
-    /**
-     * Entry point to build a generic representation. Will handle parse an object and return only stdClass, and arrays
-     * with keys and values
-     *
-     * @param $object
-     * @param string $view name of the view to be represented
-     * @return array|\stdClass
-     * @throws \Exception
-     */
-    public function buildRepresentation($object, $view = null)
-    {
-        switch (true):
-            case $this->checkArrayCollection($object):
-                $object = $object->toArray();
-            case is_array($object):
-                $output = $this->handleArray($object, $view);
-                break;
-            case is_object($object):
-                $output = $this->handleObject($object, $view);
-                break;
-            case is_null($object):
-                $output = null;
-                break;
-            case is_string($object):
-                $output = $object;
-                break;
-            case is_integer($object):
-                $output = $object;
-                break;
-            case is_bool($object):
-                $output = $object;
-                break;
-            default:
-                throw new \Exception('Can not determine how to build representation');
-            endswitch;
-
-        return $output;
     }
 
     /**
@@ -83,24 +44,21 @@ class GenericRepresentationBuilder
      */
     protected function handleObject($object, $view)
     {
-        $hash   = spl_object_hash($object);
-        $check  = array_search($hash, $this->visited);
-        $output = new \stdClass();
+        $check = $this->trackObjectVisits($object);
 
-        if ($check !== false) {
+        if ($check instanceof \stdClass){
+
+            return $check;
+        } else {
             $output = new \stdClass();
-            $rel = '$rel';
-            $output->$rel = $check;
-
-            return $output;
+            $output->_hash = $check;
         }
-        $output->_hash = count($this->visited);
-        $this->visited[] = $hash;
+
         $reflection      = new \ReflectionClass($object);
-        $classContext    = $this->classBuilder->buildClassContext($reflection, $hash, $view);
+        $classContext    = $this->classBuilder->buildClassContext($reflection, $check, $view);
 
         foreach ($classContext->properties as $property) {
-            $output = $this->handleProperty($property, $object, $output, $classContext);
+            $output = $this->handleProperty($property, $classContext, $object, $output);
         }
 
         return $output;
@@ -114,7 +72,7 @@ class GenericRepresentationBuilder
      * @param \Represent\Context\ClassContext $classContext
      * @return stdClass
      */
-    protected function handleProperty(\ReflectionProperty $property, $original, $output, ClassContext $classContext)
+    protected function handleProperty(\ReflectionProperty $property, ClassContext $classContext, $original, \stdClass $output)
     {
         $propertyContext = $this->propertyBuilder->propertyContextFromReflection($property, $original, $classContext);
         $value           = $propertyContext->value;
@@ -134,17 +92,6 @@ class GenericRepresentationBuilder
         endswitch;
 
         return $output;
-    }
-
-    /**
-     * Returns true if object is an instanceof array collection
-     *
-     * @param $object
-     * @return bool
-     */
-    protected function checkArrayCollection($object)
-    {
-        return $object instanceof \Doctrine\Common\Collections\ArrayCollection || $object instanceof \Doctrine\ORM\PersistentCollection;
     }
 
     /**

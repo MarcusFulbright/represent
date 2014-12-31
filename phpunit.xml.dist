@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit
-        backupGlobals="false"
+         backupGlobals="false"
          backupStaticAttributes="false"
          colors="true"
          convertErrorsToExceptions="true"
@@ -12,9 +12,19 @@
          bootstrap="./src/Represent/Tests/bootstrap.php" >
 
     <testsuites>
-        <testsuite name="represent test suite">
+        <testsuite name="represent">
             <directory suffix="Test.php">src/Represent/Tests</directory>
-            <exclude>src/Represent/Tests/RepresentTestCase</exclude>
+            <exclude>src/Represent/Test/RepresentTestCase</exclude>
         </testsuite>
     </testsuites>
+
+    <filter>
+        <whitelist>
+            <directory suffix=".php">src/Represent</directory>
+            <exclude>
+                <directory>vendor/</directory>
+                <directory>src/Represent/Test</directory>
+            </exclude>
+        </whitelist>
+    </filter>
 </phpunit>
