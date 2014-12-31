@@ -46,7 +46,7 @@ class GenericRepresentationBuilder extends AbstractBuilder
     {
         $check = $this->trackObjectVisits($object);
 
-        if ($check instanceof \stdClass){
+        if ($check instanceof \stdClass) {
 
             return $check;
         } else {
@@ -54,8 +54,8 @@ class GenericRepresentationBuilder extends AbstractBuilder
             $output->_hash = $check;
         }
 
-        $reflection      = new \ReflectionClass($object);
-        $classContext    = $this->classBuilder->buildClassContext($reflection, $check, $view);
+        $reflection   = new \ReflectionClass($object);
+        $classContext = $this->classBuilder->buildClassContext($reflection, $check, $view);
 
         foreach ($classContext->properties as $property) {
             $output = $this->handleProperty($property, $classContext, $object, $output);

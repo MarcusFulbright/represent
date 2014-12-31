@@ -2,25 +2,25 @@
 
 namespace Represent\Builder\Format;
 
-use Doctrine\Common\Annotations\AnnotationReader as reader;
+use Doctrine\Common\Annotations\AnnotationReader;
 use Represent\Annotations\LinkCollection;
 use Represent\Builder\AbstractBuilder;
 use Represent\Builder\ClassContextBuilder;
 use Represent\Builder\PropertyContextBuilder;
 use Represent\Context\ClassContext;
-use Represent\Generator\LinkGenerator as generator;
+use Represent\Generator\LinkGenerator;
 
 class HalFormatBuilder extends AbstractBuilder
 {
     /**
      * @var \Doctrine\Common\Annotations\AnnotationReader
      */
-    private $reader;
+    protected  $reader;
 
     /**
      * @var \Represent\Generator\LinkGenerator
      */
-    private $linkGenerator;
+    protected $linkGenerator;
 
     /**
      * {@inheritdoc}
@@ -30,11 +30,11 @@ class HalFormatBuilder extends AbstractBuilder
         $this->propertyBuilder = $propertyBuilder;
         $this->classBuilder    = $classBuilder;
 
-        if (!array_key_exists('reader', $config) || !$config['reader'] instanceof reader) {
+        if (!array_key_exists('reader', $config) || !$config['reader'] instanceof AnnotationReader) {
             throw new \Exception('HalFormatBuilder must have a doctrine annotation reader');
         }
 
-        if (!array_key_exists('linkGenerator', $config) || !$config['linkGenerator'] instanceof generator) {
+        if (!array_key_exists('linkGenerator', $config) || !$config['linkGenerator'] instanceof LinkGenerator) {
             throw new \Exception('HalFormatBuilder must have a link generator');
         }
 
@@ -135,7 +135,7 @@ class HalFormatBuilder extends AbstractBuilder
      * @param \ReflectionClass $reflection
      * @return \stdClass
      */
-    private function getEmbedded($representation, \ReflectionClass $reflection)
+    protected function getEmbedded($representation, \ReflectionClass $reflection)
     {
         $embedded   = new \stdClass();
         $properties = $reflection->getProperties();
@@ -165,7 +165,7 @@ class HalFormatBuilder extends AbstractBuilder
      * @param                  $view
      * @return \stdClass
      */
-    private function getLinks(\ReflectionClass $reflection, $view)
+    protected function getLinks(\ReflectionClass $reflection, $view)
     {
         $links = new \stdClass();
         $annot = $this->reader->getClassAnnotation($reflection, '\Represent\Annotations\LinkCollection');
@@ -184,7 +184,7 @@ class HalFormatBuilder extends AbstractBuilder
      * @param \stdClass      $output
      * @return \stdClass
      */
-    private function parseLinks(LinkCollection $annot, $view, \stdClass $output)
+    protected function parseLinks(LinkCollection $annot, $view, \stdClass $output)
     {
         $generator = $this->linkGenerator;
         array_walk(

@@ -1,13 +1,22 @@
 <?php
+/**
+ * Created by IntelliJ IDEA.
+ * User: marcusf@patientfocus.com
+ * Date: 12/31/14
+ * Time: 2:27 PM
+ * To change this template use File | Settings | File Templates.
+ */
 
-namespace Represent\Builder;
+namespace Represent\Builder\Format;
 
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Query;
+
 use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\ORM\EntityManager;
+use Represent\Builder\ClassContextBuilder;
+use Represent\Builder\PropertyContextBuilder;
 use Represent\Generator\LinkGenerator;
 
-class DoctrineGenericBuilder extends GenericRepresentationBuilder
+class DoctrineHalBuilder extends HalFormatBuilder
 {
     /**
      * @var EntityManager
@@ -58,6 +67,9 @@ class DoctrineGenericBuilder extends GenericRepresentationBuilder
         foreach ($classContext->properties as $property) {
             $output = $this->handleProperty($property, $object, $output, $classContext);
         }
+
+        $output->_embedded = $this->getEmbedded($output, new \ReflectionClass($object));
+        $output->_links    = $this->getLinks(new \ReflectionClass($object), $view);
 
         return $output;
     }
