@@ -4,7 +4,7 @@ namespace Represent\Builder;
 
 use Represent\Context\ClassContext;
 
-abstract class AbstractBuilder
+abstract class AbstractBuilder implements BuilderInterface
 {
     /**
      * @var \Represent\Builder\PropertyContextBuilder
