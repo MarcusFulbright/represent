@@ -65,7 +65,7 @@ class DoctrineHalBuilder extends HalFormatBuilder
         $classContext = $this->classBuilder->buildClassContext($reflection, $check, $view);
 
         foreach ($classContext->properties as $property) {
-            $output = $this->handleProperty($property, $object, $output, $classContext);
+            $output = $this->handleProperty($property, $classContext, $object, $output);
         }
 
         $output->_embedded = $this->getEmbedded($output, new \ReflectionClass($object));
