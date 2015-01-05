@@ -12,16 +12,18 @@ class LinkGeneratorTest extends RepresentTestCase
         $haystack = "expr('object.getFirstName')";
         $language = $this->getExpressionLangaugeMock();
         $expected = 'Success!';
+        $object   = new \stdClass();
 
-        $language->shouldReceive('evaluate')->once()->with("'object.getFirstName'")->andReturn($expected);
+        $language->shouldReceive('evaluate')->once()->with('object.getFirstName', array('object' => $object))->andReturn($expected);
         $generator = new LinkGenerator($this->getUrlGeneratorMock(), $language);
-        $result    = $this->getReflectedMethod($generator, 'evaluateExpression')->invoke($generator, $haystack);
+        $result    = $this->getReflectedMethod($generator, 'evaluateExpression')->invoke($generator, $haystack, $object);
 
         $this->assertEquals($expected, $result);
     }
 
     public function testParseParams()
     {
+        $object = new \stdClass();
         $params = array(
             'id'       => 1,
             'clientID' => 2
@@ -31,6 +33,6 @@ class LinkGeneratorTest extends RepresentTestCase
 
         $generator = new LinkGenerator($this->getUrlGeneratorMock(), $this->getExpressionLangaugeMock());
 
-        $this->assertEquals($params, $generator->parseparams($link)->parameters);
+        $this->assertEquals($params, $generator->parseparams($link, $object)->parameters);
     }
 }

@@ -161,17 +161,19 @@ class HalFormatBuilder extends AbstractBuilder
 
     /**
      * Handles getting _links
-     * @param \ReflectionClass $reflection
-     * @param                  $view
+     * @param $object
+     * @param $view
+     * @internal param \ReflectionClass $reflection
      * @return \stdClass
      */
-    protected function getLinks(\ReflectionClass $reflection, $view)
+    protected function getLinks($object, $view)
     {
+        $reflection = new \ReflectionClass($object);
         $links = new \stdClass();
         $annot = $this->reader->getClassAnnotation($reflection, '\Represent\Annotations\LinkCollection');
 
         if ($annot) {
-            $links = $this->parseLinks($annot, $view, $links);
+            $links = $this->parseLinks($annot, $view, $links, $object);
         }
 
         return $links;
@@ -182,17 +184,18 @@ class HalFormatBuilder extends AbstractBuilder
      * @param LinkCollection $annot
      * @param                $view
      * @param \stdClass      $output
+     * @param                $object
      * @return \stdClass
      */
-    protected function parseLinks(LinkCollection $annot, $view, \stdClass $output)
+    protected function parseLinks(LinkCollection $annot, $view, \stdClass $output, $object)
     {
         $generator = $this->linkGenerator;
         array_walk(
             $annot->links,
-            function($link) use ($view, $output, $generator) {
+            function($link) use ($view, $output, $generator, $object) {
                 if ($view == null || in_array($view, $link->views)) {
-                    $name = $generator->parseName($link);
-                    $output->$name = $generator->generate($link);
+                    $name = $generator->parseName($link, $object);
+                    $output->$name = $generator->generate($link, $object);
                 }
             }
         );

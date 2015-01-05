@@ -11,7 +11,7 @@ class PaginationFactoryTest extends RepresentTestCase
     {
         $data    = array(1, 2, 3);
         $factory = new PaginationFactory($this->getCollectionFactoryMock());
-        $pager   = $factory->makePagerFromArray($data);
+        $pager   = $this->getReflectedMethod($factory, 'makePagerFromArray')->invokeArgs($factory, array($data));
 
         $this->assertEquals($data, $pager->getCurrentPageResults());
         $this->assertEquals(count($data), $pager->getNbResults());

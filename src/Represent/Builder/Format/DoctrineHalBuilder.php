@@ -1,14 +1,6 @@
 <?php
-/**
- * Created by IntelliJ IDEA.
- * User: marcusf@patientfocus.com
- * Date: 12/31/14
- * Time: 2:27 PM
- * To change this template use File | Settings | File Templates.
- */
 
 namespace Represent\Builder\Format;
-
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\EntityManager;
@@ -62,14 +54,15 @@ class DoctrineHalBuilder extends HalFormatBuilder
         }
 
         $reflection   = new \ReflectionClass($object);
-        $classContext = $this->classBuilder->buildClassContext($reflection, $check, $view);
 
+        $classContext = $this->classBuilder->buildClassContext($reflection, $check, $view);
         foreach ($classContext->properties as $property) {
+
             $output = $this->handleProperty($property, $classContext, $object, $output);
         }
 
         $output->_embedded = $this->getEmbedded($output, new \ReflectionClass($object));
-        $output->_links    = $this->getLinks(new \ReflectionClass($object), $view);
+        $output->_links    = $this->getLinks($object, $view);
 
         return $output;
     }

@@ -3,10 +3,11 @@
 namespace Represent\Generator;
 
 use Represent\Annotations\Link;
+use Represent\Util\PaginatedCollection;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface as SymfonyUrlGeneratorInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
-class LinkGenerator 
+class LinkGenerator
 {
     /**
      * @var \Symfony\Component\Routing\Generator\UrlGeneratorInterface
@@ -30,32 +31,35 @@ class LinkGenerator
 
     /**
      * @param Link $link
+     * @param      $object
      * @return string
      */
-    public function generate(Link $link)
+    public function generate(Link $link, $object)
     {
-        $link = $this->parseParams($link);
+        $link = $this->parseParams($link, $object);
 
-        return $this->urlGenerator->generate($link->name, $link->parameters, $link->absolute);
+        return $this->urlGenerator->generate($this->evaluateExpression($link->uri, $object), $link->parameters, $link->absolute);
     }
 
     /**
      * @param Link $link
+     * @param      $object
      * @return string
      */
-    public function parseName(Link $link)
+    public function parseName(Link $link, $object)
     {
-        return $this->evaluateExpression($link->name);
+        return $this->evaluateExpression($link->name, $object);
     }
 
     /**
      * @param Link $link
+     * @param      $object
      * @return Link
      */
-    public function parseParams(Link $link)
+    public function parseParams(Link $link, $object)
     {
         foreach ($link->parameters as $key => $value) {
-            $link->parameters[$key] = $this->evaluateExpression($value);
+            $link->parameters[$key] = $this->evaluateExpression($value, $object);
         }
 
         return $link;
@@ -63,15 +67,21 @@ class LinkGenerator
 
     /**
      * @param       $haystack
+     * @param       $object
      * @param array $matches
      * @return string
      */
-    private function evaluateExpression($haystack, array $matches = array())
+    private function evaluateExpression($haystack, $object, array $matches = array())
     {
         preg_match("/\'(.*)\'/", $haystack, $matches);
 
         if (!empty($matches)) {
-            $output = $this->language->evaluate($matches[0]);
+            $output = $this->language->evaluate(
+                $matches[1],
+                array(
+                    'object' => $object
+                )
+            );
         } else {
             $output = $haystack;
         }
