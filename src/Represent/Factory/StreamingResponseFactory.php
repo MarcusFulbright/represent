@@ -2,11 +2,10 @@
 
 namespace Represent\Factory;
 
-use Represent\Annotations\Link;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-class ResponseFactory
+class StreamingResponseFactory
 {
     /**
      * @var PaginationFactory
@@ -38,22 +37,6 @@ class ResponseFactory
         return $response;
     }
 
-    /**
-     * Handles putting an array ($data) into a PaginatedCollection
-     *
-     * @param array $data
-     * @param Link  $link
-     * @param int   $page
-     * @param int   $limit
-     * @return \Represent\Util\PaginatedCollection
-     */
-    public function preparePagination(array $data, Link $link, $page = 1, $limit = 10)
-    {
-        return $this->paginationFactory->paginatedRepresentation(
-            $this->paginationFactory->makePagerFromArray($data, $page, $limit),
-            $link
-        );
-    }
 
     /**
      * @param $response

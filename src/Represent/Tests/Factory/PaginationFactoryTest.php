@@ -9,35 +9,25 @@ class PaginationFactoryTest extends RepresentTestCase
 {
     public function testMakePagerFromArray()
     {
-        $data = array(
-            1,
-            2,
-            3,
-        );
-
-        $factory = new PaginationFactory($this->getLinkGeneratorMock());
+        $data    = array(1, 2, 3);
+        $factory = new PaginationFactory($this->getCollectionFactoryMock());
         $pager   = $factory->makePagerFromArray($data);
 
         $this->assertEquals($data, $pager->getCurrentPageResults());
         $this->assertEquals(count($data), $pager->getNbResults());
     }
 
-    public function testPaginatedRepresentation()
+    public function testPaginate()
     {
-        $pager     = $this->getPagerMock();
-        $link      = $this->getLinkMock();
-        $generator = $this->getLinkGeneratorMock();
+        $data    = array(1,2,3,4);
+        $page    = 1;
+        $limit   = 10;
+        $url     = 'my_url';
+        $factory = $this->getCollectionFactoryMock();
 
-        $pager->shouldReceive('getCurrentPageResults')->once();
-        $pager->shouldReceive('getCurrentPage')->once();
-        $pager->shouldReceive('getNbPages')->once();
-        $pager->shouldReceive('getNbResults')->once();
+        $factory->shouldReceive('createCollectionFromPager')->andReturn('success');
+        $pagination = new PaginationFactory($factory);
 
-        $link->parameters = array();
-
-        $generator->shouldReceive('parseName')->once()->with($link);
-
-        $factory = new PaginationFactory($generator);
-        $this->assertInstanceOf('Represent\Util\PaginatedCollection', $factory->paginatedRepresentation($pager, $link));
+        $this->assertEquals('success', $pagination->paginate($data, $page, $limit, $url));
     }
 }

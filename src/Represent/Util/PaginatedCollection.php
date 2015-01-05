@@ -86,21 +86,23 @@ class PaginatedCollection
      * @param        $pages
      * @param        $total
      * @param        $route
-     * @param array  $param
+     * @param array  $params
      * @param int    $limit
      * @param string $pageParam
      * @param string $limitParam
      */
-    public function __construct($items, $page, $pages, $total, $route, $param = array(), $limit = 10, $pageParam = 'page', $limitParam = 'limit')
+    public function __construct($items, $page, $pages, $total, $route, $params = array(), $limit = 10, $pageParam = 'page', $limitParam = 'limit')
     {
         $this->items      = $items;
+        $this->page       = $page;
         $this->pages      = $pages;
         $this->total      = $total;
-        $this->limit      = $limit;
         $this->route      = $route;
+        $this->params     = $params;
+        $this->limit      = $limit;
         $this->pageParam  = $pageParam;
         $this->limitParam = $limitParam;
-        $this->page       = $page;
+
     }
 
     /**
@@ -114,7 +116,7 @@ class PaginatedCollection
     {
         $params = $this->params;
 
-        $params[$this->pageParam]  = null == $page ? $this->getPage() : $page;
+        $params[$this->pageParam]  = null == $page  ? $this->getPage()  : $page;
         $params[$this->limitParam] = null == $limit ? $this->getLimit() : $limit;
 
         return $params;

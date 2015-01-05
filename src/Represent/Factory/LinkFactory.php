@@ -8,12 +8,12 @@ class LinkFactory
 {
     public function createLink($name, $uri, $parameters = array(), $views = array(), $absolute = false)
     {
-        $link  = new Link();
-        $link->name = $name;
-        $link->uri = $uri;
+        $link             = new Link();
+        $link->name       = $name;
+        $link->uri        = $uri;
         $link->parameters = $parameters;
-        $link->views = $views;
-        $link->absolute = $absolute;
+        $link->views      = $views;
+        $link->absolute   = $absolute;
 
         return $link;
     }

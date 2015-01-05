@@ -12,16 +12,16 @@ use Represent\Util\PaginatedCollection;
 class PaginationFactory
 {
     /**
-     * @var \Represent\Generator\LinkGenerator
+     * @var CollectionFactory
      */
-    private $linkGenerator;
+    private $factory;
 
     /**
-     * @param \Represent\Generator\LinkGenerator $linkGenerator
+     * @param CollectionFactory $collectionFactory
      */
-    public function __construct(LinkGenerator $linkGenerator)
+    public function __construct(CollectionFactory $collectionFactory)
     {
-        $this->linkGenerator = $linkGenerator;
+        $this->factory = $collectionFactory;
     }
 
     /**
@@ -32,7 +32,7 @@ class PaginationFactory
      * @param int $limit
      * @return Pagerfanta
      */
-    public function makePagerFromArray($data, $page = 1, $limit = 10)
+    protected function makePagerFromArray($data, $page = 1, $limit = 10)
     {
         $adapter = new ArrayAdapter($data);
         $pager   = new Pagerfanta($adapter);
@@ -43,21 +43,19 @@ class PaginationFactory
     }
 
     /**
-     * Creates a paginated representation from a pager
+     * Handles creating a pager and turning it into a collection representation
      *
-     * @param Pagerfanta $pager
-     * @param Link       $link
+     * @param       $data
+     * @param       $page
+     * @param       $limit
+     * @param       $url
+     * @param array $params
      * @return PaginatedCollection
      */
-    public function paginatedRepresentation(Pagerfanta $pager, Link $link)
+    public function paginate(array $data, $page, $limit , $url, $params = array())
     {
-        return new PaginatedCollection(
-            $pager->getCurrentPageResults(),
-            $pager->getCurrentPage(),
-            $pager->getNbPages(),
-            $pager->getNbResults(),
-            $this->linkGenerator->parseName($link),
-            $link->parameters
-        );
+        $pager = $this->makePagerFromArray($data, $page, $limit);
+
+        return $this->factory->createCollectionFromPager($pager, $url, $params);
     }
 }

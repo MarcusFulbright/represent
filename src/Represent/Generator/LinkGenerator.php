@@ -55,7 +55,7 @@ class LinkGenerator
     public function parseParams(Link $link)
     {
         foreach ($link->parameters as $key => $value) {
-            $link->$key = $this->evaluateExpression($value);
+            $link->parameters[$key] = $this->evaluateExpression($value);
         }
 
         return $link;

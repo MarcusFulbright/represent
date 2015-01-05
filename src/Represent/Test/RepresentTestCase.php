@@ -167,6 +167,11 @@ class RepresentTestCase extends \PHPUnit_Framework_TestCase
         return \Mockery::mock('Represent\Builder\ClassContextBuilder');
     }
 
+    protected function getCollectionFactoryMock()
+    {
+        return \Mockery::mock('Represent\Factory\CollectionFactory');
+    }
+
     /**
      * Creates a reflection method and makes it accessible
      *
