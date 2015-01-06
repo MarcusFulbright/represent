@@ -5,32 +5,33 @@ namespace Represent\Util;
 use Represent\Annotations as Represent;
 
 /**
- * @Represent\ExclusionPolicy(policy="blackList")
+ * @Represent\ExclusionPolicy(policy="whiteList")
  * @Represent\LinkCollection(links={
  *     @Represent\Link(
  *         name="self",
- *         uri="expr('object.getRoute')",
- *         parameters="expr('object.getParameters')"
+ *         uri="expr('object.getRoute()')",
+ *         parameters="expr('object.getParameters()')"
  *     ),
  *     @Represent\Link(
  *         name="first",
- *         uri="expr('object.getRoute')",
+ *         uri="expr('object.getRoute()')",
  *         parameters="expr('object.getParameters(1)')"
  *     ),
  *     @Represent\Link(
  *         name="last",
- *         uri="expr('object.getRoute')",
- *         parameters="expr('object.getParameters(object.getPages()))')"
+ *         uri="expr('object.getRoute()')",
+ *         parameters="expr('object.getParameters(object.getPages())')"
  *     ),
  *     @Represent\Link(
  *         name="next",
- *         uri="expr('object.getRoute')",
+ *         uri="expr('object.getRoute()')",
  *         parameters="expr('object.getParameters(object.getPages() + 1)')"
  *     ),
  *     @Represent\Link(
  *        name="previous",
- *        uri="expr('object.getRoute')",
+ *        uri="expr('object.getRoute()')",
  *        parameters="expr('object.getParameters(object.getPages() - 1)')"
+ *  )
  * })
  */
 class PaginatedCollection
